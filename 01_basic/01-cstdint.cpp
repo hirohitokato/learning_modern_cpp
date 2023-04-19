@@ -1,4 +1,4 @@
-// 大きさが規定されている整数型
+/// 大きさが規定されている整数型
 
 #include <cstdint>
 #include <iostream>
@@ -11,8 +11,7 @@ int main() {
         // - 指定したビット長ちょうどのサイズを持つ整数型
         int8_t a; // 未初期化で宣言
         int32_t b{}; // 値ゼロで初期化
-        uint64_t c{193}; // 193で初期化 
-        printf("--> %d\n", a);
+        uint64_t c{193}; // 193で初期化
         cout << "int8_t:   [" << a << "] / size:" << sizeof(a) << endl;
         cout << "int32_t:  [" << b << "] / size:" << sizeof(b) << endl;
         cout << "uint64_t: [" << c << "] / size:" << sizeof(c) << endl;
@@ -42,5 +41,9 @@ int main() {
         // - コールバック関数に渡す引数として、任意のオブジェクトを設定する
 
         // サンプルコード： https://cpprefjp.github.io/reference/cstdint/intptr_t.html
+        int value = 42;
+        // value変数へのポインタを、整数値として保持する
+        intptr_t pointer_value = reinterpret_cast<intptr_t>(&value);
+        cout << std::hex << "0x" << pointer_value << endl;
     }
 }
