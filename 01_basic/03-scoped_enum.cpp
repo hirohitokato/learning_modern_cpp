@@ -102,7 +102,7 @@ int main()
         auto b3 = std::get<static_cast<std::size_t>(Color::blue)>(rgb);
 
         // でもC++17以降であれば構造化束縛が使えるのでもはや使われない
-        // (そもそも構造体やクラスを使う場面)
+        // (そもそも構造体やクラスを使う場面だし…)
         auto [r4, g4, b4] = get_rgb();
         cout << "r/g/b : " << r4 << "/" << g4 << "/" << b4 << endl;
     }
