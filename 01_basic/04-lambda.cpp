@@ -19,6 +19,15 @@ int main() {
     using namespace std;
 
     {
-
+        // もっとも小さなラムダ式
+        auto f = []{};
+        f(); // 呼べる
+    }
+    cout << "-------------------------------------" << endl;
+    {
+        auto f = [](int a, const char *b) {
+            cout << a << " & " << b << endl;
+        };
+        f(193, "Hello");
     }
 }
