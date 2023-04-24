@@ -15,19 +15,54 @@
 
 #include <iostream>
 
-int main() {
+int main()
+{
     using namespace std;
 
     {
         // もっとも小さなラムダ式
-        auto f = []{};
+        auto f = [] {};
         f(); // 呼べる
+
+        // 作成したラムダ式はその場で呼び出せる
+        auto x = [](int a, int b) -> int {
+            return a * b;
+        }(2, 10); // その場で2&10と共に呼んでいる。
+        cout << "x is " << x << endl; // "x is 20"
     }
     cout << "-------------------------------------" << endl;
     {
-        auto f = [](int a, const char *b) {
+        // 引数を２つ持つ場合
+        auto f = [](int a, const char *b)
+        {
             cout << a << " & " << b << endl;
-        };
+        }; // セミコロンを忘れないように
         f(193, "Hello");
+
+        // 引数２つとint型の返り値を持つ場合
+        auto g = [](int a, int b) -> int
+        {
+            return a + b;
+        };
+        cout << "5 + 8 = " << g(5, 8) << endl;
+        // この書き方でもOK
+        // 返り値の型を推論してくれている
+        auto g2 = [](int a, int b)
+        {
+            return a + b;
+        };
+        cout << "4 + 3 = " << g2(4, 3) << endl;
+
+        // (中身の話)↑のラムダ式は、コンパイル時に次のような形で
+        // 関数オブジェクトとしてコンパイルされている
+        struct some_G /*名前はコンパイラが勝手に決める*/
+        {
+            int operator()(int a, int b) const
+            {
+                return a + b;
+            }
+        };
+        some_G g3{};
+        cout << "5 + 6 = " << g3(5, 6) << endl;
     }
 }
