@@ -13,14 +13,14 @@ enum Color
 };
 
 // 今の書き方
-enum struct /*classも可*/ ScopedColor
+enum struct /*classも可。まったく同じ意味*/ ScopedColor
 {
     red,
     green = 1,
     blue
 };
 
-enum struct /*classも可*/ Diretion
+enum class /*structも可*/ Diretion
 {
     up,
     down,
@@ -45,7 +45,7 @@ int main()
     {
         // 古い書き方
 
-        // 問題1: 古い書き方はグローバルな名前空間を汚染してしまう
+        // 問題1: 古い書き方はグローバル名前空間を汚染してしまう
         // (Colorが通用する場面ではRed/green/Blueの名前が使えない)
         cout << "red   : " << red << endl;
         cout << "green: " << green << endl;
@@ -92,14 +92,14 @@ int main()
         cout << "r/g/b : " << r << "/" << g << "/" << b << endl;
 
         // enumを使って名前でアクセスできる
-        auto r2 = std::get<Color::red>(rgb);
-        auto g2 = std::get<Color::green>(rgb);
-        auto b2 = std::get<Color::blue>(rgb);
+        auto r2 = std::get<red>(rgb);
+        auto g2 = std::get<green>(rgb);
+        auto b2 = std::get<blue>(rgb);
 
         // スコープ付き列挙型だとけっこう面倒
         auto r3 = std::get<static_cast<std::size_t>(ScopedColor::red)>(rgb);
-        auto g3 = std::get<static_cast<std::size_t>(Color::green)>(rgb);
-        auto b3 = std::get<static_cast<std::size_t>(Color::blue)>(rgb);
+        auto g3 = std::get<static_cast<std::size_t>(ScopedColor::green)>(rgb);
+        auto b3 = std::get<static_cast<std::size_t>(ScopedColor::blue)>(rgb);
 
         // でもC++17以降であれば構造化束縛が使えるのでもはや使われない
         // (そもそも構造体やクラスを使う場面だし…)
@@ -112,3 +112,8 @@ std::tuple<int, int, int> get_rgb()
 {
     return std::make_tuple(38, 64, 47);
 }
+
+// Q1: enum structとenum classは同じ？
+//   -> まったく同じ
+// Q2: tuple使う？
+//   -> むしろ使わない方がいい。privateのような閉じた世界でなら
