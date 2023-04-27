@@ -64,5 +64,6 @@ int main()
         };
         some_G g3{};
         cout << "5 + 6 = " << g3(5, 6) << endl;
+        cout << typeid(g2).name() << endl;
     }
 }
