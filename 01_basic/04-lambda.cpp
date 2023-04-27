@@ -63,7 +63,7 @@ int main()
             }
         };
         some_G g3{};
-        cout << "5 + 6 = " << g3(5, 6) << endl;
-        cout << typeid(g2).name() << endl;
+        cout << "4 + 3 = " << g3(4, 3) << endl; // 上のg2と同じ結果
+        cout << "type of g2:" << typeid(g2).name() << endl; // macOSだと「Z4mainE3$_4」のように出力される
     }
 }
