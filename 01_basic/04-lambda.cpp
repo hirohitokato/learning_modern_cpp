@@ -141,6 +141,22 @@ int main()
         //     // ここでthisを参照し処理を実行できる。private変数等でもOK
         //     this->x = this->get_value(); // 例
         // }
+        class TmpClass {
+        private:
+            int x;
+        public:
+            TmpClass(int x): x(x) {}
+
+            void add(int y) {
+                auto in_add = [this, y]() {
+                    // thisのprivateにもアクセスできる
+                    return this->x + y;
+                };
+                cout << "this->x + y = " << in_add() << endl; // "this->x + y = 12";
+            }
+        };
+        auto obj = TmpClass{7};
+        obj.add(5);
     }
     cout << "-------------------------------------" << endl;
     {
