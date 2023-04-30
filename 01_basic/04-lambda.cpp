@@ -214,10 +214,14 @@ std::function<int(int)> invalid_lambda_example()
 {
     int n = 3;
     return [&n](int i) -> int
-    { return n + i; }; // ローカル変数nを参照キャプチャし利用している(NG!)
+    { return n + i; }; // ローカル変数nを参照キャプチャし利用したラムダ式を返している(NG!)
 }
 
-
+void long_process(int(*fp)(int, int))
+{
+  int result = fp(2, 3);
+  std::cout << result << std::endl;
+}
 
 // * ラムダ式のメリットは何？
 //   * 名前を考えなくて良い
