@@ -15,7 +15,10 @@
 // - 複合文(必須)
 
 #include <iostream>
+#include <functional>
 #include <string>
+
+std::function<int(int)> invalid_lambda_example();
 
 int main()
 {
@@ -195,12 +198,23 @@ int main()
     {
         // キャプチャするときの注意
         // * キャプチャした変数の寿命に注意
+
+        // ラムダ式が参照キャプチャしている変数の寿命が切れたあとで呼び出したときの動作は未定義
+        auto foo = invalid_lambda_example()(2); // 未定義の振る舞い
+        cout << "foo value is unspecified. : " << foo << endl;
     }
     cout << "-------------------------------------" << endl;
     {
         // キャプチャしないラムダ式であれば普通の関数ポインタのように使える
         // (キャプチャしているとコンパイルエラー)
     }
+}
+
+std::function<int(int)> invalid_lambda_example()
+{
+    int n = 3;
+    return [&n](int i) -> int
+    { return n + i; }; // ローカル変数nを参照キャプチャし利用している
 }
 
 // * ラムダ式のメリットは何？
