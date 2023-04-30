@@ -214,8 +214,10 @@ std::function<int(int)> invalid_lambda_example()
 {
     int n = 3;
     return [&n](int i) -> int
-    { return n + i; }; // ローカル変数nを参照キャプチャし利用している
+    { return n + i; }; // ローカル変数nを参照キャプチャし利用している(NG!)
 }
+
+
 
 // * ラムダ式のメリットは何？
 //   * 名前を考えなくて良い
