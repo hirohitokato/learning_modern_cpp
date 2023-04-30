@@ -141,14 +141,18 @@ int main()
         //     // ここでthisを参照し処理を実行できる。private変数等でもOK
         //     this->x = this->get_value(); // 例
         // }
-        class TmpClass {
+        class TmpClass
+        {
         private:
             int x;
-        public:
-            TmpClass(int x): x(x) {}
 
-            void add(int y) {
-                auto in_add = [this, y]() {
+        public:
+            TmpClass(int x) : x(x) {}
+
+            void add(int y)
+            {
+                auto in_add = [this, y]()
+                {
                     // thisのprivateにもアクセスできる
                     return this->x + y;
                 };
@@ -161,10 +165,27 @@ int main()
     cout << "-------------------------------------" << endl;
     {
         // まとめてキャプチャ
-
+        int a{3}, b{9}, c{7};
         // 定義したタイミングで見えるすべての自動変数をキャプチャしたいときは[=]または[&]と書く
         // * [=](…){…}  : 全ての外の変数をコピーキャプチャ
         // * [&](…){…}  : 全ての外の変数を参照キャプチャ
+        auto f = [=]()
+        {
+            cout << a << "/" << b << "/" << c << endl; // a,b,cすべて参照できる
+        };
+        auto g = [&]()
+        {
+            a *= 2; // a,b,cすべて変更できる
+            b *= 3;
+            c *= 4;
+        };
+        f();
+        g();
+        cout << a << "/" << b << "/" << c << endl; // a,b,cすべて変更されている
+
+        // 応用
+        // * [&, x]  : デフォルトで参照キャプチャ、変数xのみコピーして、ラムダ式のなかで使用する
+        // * [=, &x] : デフォルトでコピーキャプチャ、変数xのみ参照して、ラムダ式のなかで使用する
     }
     cout << "-------------------------------------" << endl;
     {
