@@ -19,6 +19,7 @@
 #include <string>
 
 std::function<int(int)> invalid_lambda_example();
+void long_process(void (*completion_handler)(int));
 
 int main()
 {
@@ -207,6 +208,10 @@ int main()
     {
         // キャプチャしないラムダ式であれば普通の関数ポインタのように使える
         // (キャプチャしているとコンパイルエラー)
+        long_process([](int result)
+                     { cout << result << endl; }); // OK
+        // long_process([=](int result)
+        //              { cout << result << endl; }); // コンパイルエラー!
     }
 }
 
@@ -217,10 +222,14 @@ std::function<int(int)> invalid_lambda_example()
     { return n + i; }; // ローカル変数nを参照キャプチャし利用したラムダ式を返している(NG!)
 }
 
-void long_process(int(*fp)(int, int))
+/// @brief 関数ポインタを引数に持つ関数
+/// @param completion_handler 処理完了時に呼び出されるコールバック
+void long_process(void (*completion_handler)(int))
 {
-  int result = fp(2, 3);
-  std::cout << result << std::endl;
+    // 長時間の処理
+    int long_process_result = 42;
+    // コールバックの関数ポインタを呼び出し
+    completion_handler(long_process_result);
 }
 
 // * ラムダ式のメリットは何？
