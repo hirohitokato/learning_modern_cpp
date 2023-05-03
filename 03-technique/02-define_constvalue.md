@@ -6,6 +6,22 @@
 * ヘッダファイルには `extern const int FOOBAR;` と書いておく
     * .cppファイルに `const int FOOBAR = 4649;` と書く
 
+```cpp
+// .hファイル
+
+namespace MyLibrary {
+    extern const int FooValue;
+}
+```
+
+```cpp
+// .cppファイル
+
+namespace MyLibrary {
+    const int FooValue = 42;
+}
+```
+
 ## 理由
 
 * ビルド時間を短くする
