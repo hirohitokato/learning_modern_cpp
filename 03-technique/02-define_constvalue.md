@@ -18,9 +18,7 @@ namespace MyLibrary {
     extern const int MaxNameLength;
     extern const std::string LOG_FILENAME;
 }
-```
 
-```cpp
 // my_library.cppファイル
 #include "my_library.h"
 
