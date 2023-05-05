@@ -41,6 +41,13 @@ namespace MyLibrary {
 
 ### 方法1のデメリット
 
-* 
+* 定数表現を評価できなくなる
+
+```cpp
+// other.cpp
+#include "my_library.h"
+
+char name1[MyLibrary::MaxNameLength]; // コンパイルエラー！値が分からない
+```
 
 ## 方法2: constexprを利用する
