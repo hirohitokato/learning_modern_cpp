@@ -37,7 +37,7 @@ namespace MyLibrary {
 * バイナリサイズが小さくなる(塵も積もれば…)
     * 各objファイルが共通の値を見に行くため
 
-### その他の方法
+### その他の方法①
 
 クラスの静的変数として宣言する。
 
@@ -50,8 +50,18 @@ public:
     static const int FooValue;
     static const int MaxNameLength;
     static const std::string LOG_FILENAME;
-}
+};
+
+// my_library.cppファイル
+#include "my_library.h"
+
+const int MyLibrary::FooValue = 42;
+const int MyLibrary::MaxNameLength = 255;
+const std::string MyLibrary::LOG_FILENAME;
 ```
+
+### その他の方法②
+
 
 ### 方法1のデメリット
 
