@@ -41,6 +41,19 @@ namespace MyLibrary {
 
 ### その他の方法
 
+クラスの静的変数として宣言する。
+
+```cpp
+// my_library.hファイル
+#include <string>
+
+class MyLibrary {
+public:
+    static const int FooValue;
+    static const int MaxNameLength;
+    static const std::string LOG_FILENAME;
+}
+```
 
 ### 方法1のデメリット
 
