@@ -54,7 +54,7 @@ int main()
         auto red = 5;                              // コンパイラによっては再定義エラーになる。
                                                    // ならない場合も以降このスコープでredが使えない
         cout << "| red is " << red << endl;        // 5
-        cout << "| red is " << Color::red << endl; // こうすれば 0
+        cout << "| red is " << Color::red << endl; // こうすれば 0。ただしどちらでも書けてしまうのはわかりにくい
 
         // 問題2: ただの数値なのでおかしなことができてしまう
         cout << "blue + 5 = " << blue + 5 << endl;                                         // ?!
