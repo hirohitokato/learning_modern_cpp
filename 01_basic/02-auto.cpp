@@ -45,6 +45,9 @@ public:
 int main()
 {
     {
+        // 右辺の内容に応じて適切な型で推論してくれる
+
+        // (※fooは本ファイルの冒頭で定義した関数)
         auto x = foo(); // xはint型
         auto fx = foo;  // xはint型を返す関数ポインタ `int (*)()`
         auto y = 1.0;   // yはdouble型
