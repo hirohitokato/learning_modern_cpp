@@ -60,13 +60,17 @@ int main()
         int i = 100;
         auto p_i1 = &i;  // p_i1はint*型
         auto *p_i2 = &i; // p_i2はint*型
+
         // ↓はエラーになる。型が値/ポインタ/参照のどれなのか意識して書くとコンパイルエラーにしてくれて良い
         // auto *p_i3 = i;
+
+        // constはできるだけ付けておくと安全なコードが書けるようになる
+        // const auto x = 100.0;
     }
     cout << "-------------------------------------" << endl;
     {
-        auto a = make_unique<int>(5);
-        auto b = make_unique<int>(7);
+        auto a = make_unique<int>(5); // std::unique_ptr<int>
+        auto b = make_unique<int>(7); // std::unique_ptr<double>
 
         // ラムダ式はコンパイラしか型情報が分からない → autoで推論する変数でしか束縛できない(*)
         auto some_func = [](const std::unique_ptr<int> &p1, const std::unique_ptr<int> &p2)
