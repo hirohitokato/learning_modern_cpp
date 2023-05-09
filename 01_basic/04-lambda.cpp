@@ -19,6 +19,7 @@
 #include <string>
 
 std::function<int(int)> invalid_lambda_example();
+void func_with_callback(int a, std::function<void(int)> callback);
 void long_process(void (*completion_handler)(int));
 
 int main()
@@ -193,18 +194,20 @@ int main()
     }
     cout << "-------------------------------------" << endl;
     {
-        // 関数引数に渡したり、後で使うようにする場合
-
-        // std::functionでラップしてあげる
-    }
-    cout << "-------------------------------------" << endl;
-    {
         // キャプチャするときの注意
         // * キャプチャした変数の寿命に注意
 
         // ラムダ式が参照キャプチャしている変数の寿命が切れたあとで呼び出したときの動作は未定義
         auto foo = invalid_lambda_example()(2); // 未定義の振る舞い
         cout << "foo value is unspecified. : " << foo << endl;
+    }
+    cout << "-------------------------------------" << endl;
+    {
+        // 関数引数に渡したり、後で使うようにする場合
+
+        // std::functionでラップしてあげる
+        // (独自型で作られるため、型が指定できないため)
+        func_with_callback(5, std::function<void(int)>([](int x){ cout << "callback with " << x << endl; }));
     }
     cout << "-------------------------------------" << endl;
     {
@@ -222,6 +225,10 @@ std::function<int(int)> invalid_lambda_example()
     int n = 3;
     return [&n](int i) -> int
     { return n + i; }; // ローカル変数nを参照キャプチャし利用したラムダ式を返している(NG!)
+}
+
+void func_with_callback(int a, std::function<void(int)> callback) {
+    callback(a * 2);
 }
 
 /// @brief 関数ポインタを引数に持つ関数
