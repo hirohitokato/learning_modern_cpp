@@ -11,4 +11,4 @@
 
 // weak
 
-// scoped?
+// scoped/autoは使わない
