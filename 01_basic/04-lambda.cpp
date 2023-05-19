@@ -19,8 +19,8 @@
 #include <string>
 
 std::function<int(int)> invalid_lambda_example();
-void func_with_callback(int a, std::function<void(int)> callback);
-void long_process(void (*completion_handler)(int));
+void function_with_callback(int a, std::function<void(int)> callback);
+void some_function_with_c_callback(void (*completion_handler)(int));
 
 int main()
 {
@@ -156,10 +156,11 @@ int main()
 
             void add(int y)
             {
-                auto in_add = [this, y]()
+                int z = 3;
+                auto in_add = [this, y, z]()
                 {
                     // thisのprivateにもアクセスできる
-                    return this->x + y;
+                    return this->x + y + z;
                 };
                 cout << "this->x + y = " << in_add() << endl; // "this->x + y = 12";
             }
@@ -207,15 +208,17 @@ int main()
 
         // std::functionでラップしてあげる
         // (独自型で作られるため、型が指定できないため)
-        func_with_callback(5, std::function<void(int)>([](int x){ cout << "callback with " << x << endl; }));
+        function_with_callback(5,
+                               std::function<void(int)>([](int x)
+                                                        { cout << "callback with " << x << endl; }));
     }
     cout << "-------------------------------------" << endl;
     {
         // キャプチャしないラムダ式であれば普通の関数ポインタのように使える
         // (キャプチャしているとコンパイルエラー)
-        long_process([](int result)
-                     { cout << result << endl; }); // OK
-        // long_process([=](int result)
+        some_function_with_c_callback([](int result)
+                                      { cout << result << endl; }); // OK
+        // some_function_with_c_callback([=](int result)
         //              { cout << result << endl; }); // コンパイルエラー!
     }
 }
@@ -227,13 +230,14 @@ std::function<int(int)> invalid_lambda_example()
     { return n + i; }; // ローカル変数nを参照キャプチャし利用したラムダ式を返している(NG!)
 }
 
-void func_with_callback(int a, std::function<void(int)> callback) {
+void function_with_callback(int a, std::function<void(int)> callback)
+{
     callback(a * 2);
 }
 
 /// @brief 関数ポインタを引数に持つ関数
 /// @param completion_handler 処理完了時に呼び出されるコールバック
-void long_process(void (*completion_handler)(int))
+void some_function_with_c_callback(void (*completion_handler)(int))
 {
     // 長時間の処理
     int long_process_result = 42;
