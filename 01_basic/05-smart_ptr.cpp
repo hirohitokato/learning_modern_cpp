@@ -9,6 +9,7 @@ struct MyClass
 {
     MyClass() : value(1) {}
     MyClass(int x, double y) : value(x) {}
+    ~MyClass() { std::cout << "destruct" << std::endl; }
 
     int value;
     void method()
@@ -21,7 +22,8 @@ void learn_unique_ptr();
 void learn_shared_ptr();
 void learn_weak_ptr();
 
-int main() {
+int main()
+{
     // 前提： 設計において、人間はポインタが指す先(リソース)に対し「誰の持ち物か」を意識している
     {
         using namespace std;
@@ -80,6 +82,11 @@ void learn_unique_ptr()
     std::unique_ptr<int[]> array = std::make_unique<int[]>(10); // C++20～
     std::unique_ptr<int[]> old_array(new int[10]);              // ～C++17
 
+    // あとからセットしたい場合はreset()を使う
+    {
+        std::unique_ptr<MyClass> obj3;
+        obj3.reset(new MyClass);
+    }
     // 取り扱い
     // *  : 中身にアクセスする
     // -> : ポインタの要素にアクセスする
