@@ -136,9 +136,23 @@ void learn_unique_ptr()
     // release()の返り値を使う。
     {
         int *raw_pointer = x1.release(); // 一度releaseするとx1が破棄されるときにdeleteしなくなる
-
         delete raw_pointer;
+        std::cout << "x1.release()" << std::endl;
     }
+
+    // 応用：
+    // 解放時に独自関数を実行させることもできる（カスタムデリータ）。
+    // ※カスタムデリータを定義するときにmake_uniqueは使えないので注意
+    {
+        auto custom_deleter = [](int *x)
+        {
+            // リソース解放処理をここで書いてあげる（ファイルクローズとか）
+            std::cout << "custom_deleter for " << *x << " is called." << std::endl;
+            if (x != nullptr)
+                delete x;
+        };
+        std::unique_ptr<int, void (*)(int *)> pointer{new int(4649), custom_deleter};
+    } // ここで"custom_deleter for 4649 is called."が出力される
 }
 
 void learn_shared_ptr()
