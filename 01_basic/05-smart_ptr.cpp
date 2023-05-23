@@ -40,7 +40,7 @@ int main()
         delete a;
     }
 
-    // 所有権を明示し強制できて、安全に使えるようになるといいな
+    // 所有権を明示し強制できて、安全に使えるようになると嬉しい
     // → スマートポインタの登場。ポインタを生で使わないですむため、以下に心配しなくて良い
     // * 不正アクセス
     // * 解放忘れ
@@ -49,9 +49,11 @@ int main()
     // モダンなC++プログラミングではnew/deleteを使わない
 
     // 1. std::unique_ptr
+    std::cout << "--- 1. std::unique_ptr ---" << std::endl;
     learn_unique_ptr();
 
     // 2. std::shared_ptr
+    std::cout << "--- 2. std::shared_ptr ---" << std::endl;
     learn_shared_ptr();
 
     // 3. std::weak_ptr
@@ -165,8 +167,32 @@ void learn_shared_ptr()
     std::shared_ptr<MyClass> obj2 = std::make_shared<MyClass>(200, 3.14); // コンストラクタへの引数も渡せる
 
     // 配列も作れる
-    std::shared_ptr<int[]> array = std::make_shared<int[]>(10); // C++20～
-    std::shared_ptr<int[]> old_array(new int[10]);              // ～C++17
+    std::shared_ptr<int[]> array = std::make_shared<int[]>(10);
+    std::shared_ptr<int[]> old_array(new int[10]);
+
+    // あとからセットしたい場合はreset()を使う
+    {
+        std::shared_ptr<MyClass> obj3;
+        obj3.reset(new MyClass{15, 1.41});
+    }
+    // 取り扱い
+    // *  : 中身にアクセスする
+    // -> : ポインタの要素にアクセスする
+    {
+        std::cout << x1 << "/" << *x1 << "/" << *x2 << std::endl; // → {アドレス}/100/193
+        obj1->method();                                           // → Hello smart pointer!
+        std::cout << obj2->value << std::endl;                    // → 200
+
+        // [] : 要素にもアクセス可能
+        array[5] = 10;
+        old_array[8] = 3;
+        for (size_t i = 0; i < 10; i++)
+        {
+            // array[5]とold_array[8]で設定された値が出てくる（他は未初期化）
+            std::cout << array[i] << "/" << old_array[i] << ", ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 void learn_weak_ptr()
