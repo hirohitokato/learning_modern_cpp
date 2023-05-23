@@ -66,11 +66,6 @@ int main()
 //
 void learn_unique_ptr()
 {
-    //
-    // 1. std::unique_ptr
-    // 所有者が常に1人であることを保証してくれるスマートポインタ
-    //
-
     // 作成
     // コンストラクタを使う。ただしできるだけmake_uniqueを使う(C++14～)
     std::unique_ptr<int> x1 = std::make_unique<int>(100);
@@ -155,8 +150,23 @@ void learn_unique_ptr()
     } // ここで"custom_deleter for 4649 is called."が出力される
 }
 
+//
+// 2. std::shared_ptr
+// 所有者(複数)がいなくなったときにリソース解放を保証してくれるスマートポインタ
+//
 void learn_shared_ptr()
 {
+    // 作成: unique_ptrとほとんど同じ
+    //
+    // コンストラクタを使う。ただしできるだけmake_sharedを使う
+    std::shared_ptr<int> x1 = std::make_shared<int>(100);
+    std::shared_ptr<int> x2{new int{193}}; // これも可
+    std::shared_ptr<MyClass> obj1 = std::make_shared<MyClass>();
+    std::shared_ptr<MyClass> obj2 = std::make_shared<MyClass>(200, 3.14); // コンストラクタへの引数も渡せる
+
+    // 配列も作れる
+    std::shared_ptr<int[]> array = std::make_shared<int[]>(10); // C++20～
+    std::shared_ptr<int[]> old_array(new int[10]);              // ～C++17
 }
 
 void learn_weak_ptr()
