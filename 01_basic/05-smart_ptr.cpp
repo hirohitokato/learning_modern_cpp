@@ -12,6 +12,7 @@ struct MyClass
     ~MyClass() { std::cout << "destruct" << std::endl; }
 
     int value;
+    // ここでunique_ptrのメンバ変数を作った場合の生存期間はクラスと一緒になる
     void method()
     {
         std::cout << "Hello smart pointer!\n";
@@ -36,7 +37,7 @@ int main()
         // a?b?それとも両方？
 
         // 問題2：
-        // 不要になったときにaとbどちらをdeleteすべき？
+        // 不要になったときにaとbどちらをdeleteすべき？残ったbはどうなる？
         delete a;
     }
 
@@ -76,14 +77,16 @@ void learn_unique_ptr()
     std::unique_ptr<MyClass> obj2 = std::make_unique<MyClass>(200, 3.14); // コンストラクタへの引数も渡せる
 
     // 配列も作れる
-    std::unique_ptr<int[]> array = std::make_unique<int[]>(10); // C++20～
-    std::unique_ptr<int[]> old_array(new int[10]);              // ～C++17
+    std::unique_ptr<int[]> array = std::make_unique<int[]>(10); // C++20～。10個の要素を持つ未初期化の配列
+    std::unique_ptr<int[]> old_array(new int[10]);              // ～C++17。10個の要素を持つ未初期化の配列
 
     // あとからセットしたい場合はreset()を使う
     {
+        auto x = new MyClass();
         std::unique_ptr<MyClass> obj3;
-        obj3.reset(new MyClass);
+        obj3.reset(x) // obj3.reset();だとnullptrが渡される
     }
+
     // 取り扱い
     // *  : 中身にアクセスする
     // -> : ポインタの要素にアクセスする
@@ -126,6 +129,7 @@ void learn_unique_ptr()
     {
         int *raw_pointer = x1.get();
         std::cout << raw_pointer << "/" << *raw_pointer << std::endl; // → {アドレス}/100
+        std::cout << "x1 is " << (x1 ? "active"s : "inactive"s) << std::endl; // x1 is active
         // delete raw_pointer; // だめ！
     }
 
@@ -133,7 +137,8 @@ void learn_unique_ptr()
     // release()の返り値を使う。
     {
         int *raw_pointer = x1.release(); // 一度releaseするとx1が破棄されるときにdeleteしなくなる
-        delete raw_pointer;
+        std::cout << "x1 is " << (x1 ? "active"s : "inactive"s) << std::endl; // x1 is inactive
+        delete raw_pointer;                                                   // 呼んであげないとメモリリーク
         std::cout << "x1.release()" << std::endl;
     }
 
@@ -150,6 +155,14 @@ void learn_unique_ptr()
         };
         std::unique_ptr<int, void (*)(int *)> pointer{new int(4649), custom_deleter};
     } // ここで"custom_deleter for 4649 is called."が出力される
+      // 注意: release()を途中で呼び中のポインタを取り出すとカスタムデリータも呼ばれなくなる
+
+    // メリット：
+    // * 所有権が１つであることを明確にできる
+    // * スコープを外れたら確実に解放してくれる
+    // * ポインタのように使える。既存ポインタからも作れる
+    // * メモリ解放の安心感(スタック変数のように使える＆スタック領域を消費しない)
+    // * カスタムデリータを使えば後始末のようなこともできる
 }
 
 //
