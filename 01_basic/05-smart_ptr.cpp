@@ -279,6 +279,25 @@ void learn_shared_ptr()
             auto v_shared = std::make_shared<std::vector<int>>(initializer_list);
         }
     }
+
+    // 使用上の注意
+    // レファレンスカウント方式あるある：循環参照
+    {
+        struct Sample
+        {
+            std::shared_ptr<Sample> ref;
+            ~Sample()
+            {
+                std::cout << "destructed!" << std::endl; // 呼ばれない
+            }
+        };
+
+        auto s1 = std::make_shared<Sample>();
+        auto s2 = std::make_shared<Sample>();
+        s1->ref = s2;
+        s2->ref = s1;
+    } // 本来ここでSampleのデストラクタが呼ばれるはずだが、呼ばれない!!
+    // 解消するためには、次に示すstd::weak_ptrを使う必要がある
 }
 
 void learn_weak_ptr()
