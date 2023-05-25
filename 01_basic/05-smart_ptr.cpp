@@ -129,7 +129,7 @@ void learn_unique_ptr()
     // get()したデータを絶対deleteしないように！！
     {
         int *raw_pointer = x1.get();
-        std::cout << raw_pointer << "/" << *raw_pointer << std::endl; // → {アドレス}/100
+        std::cout << raw_pointer << "/" << *raw_pointer << std::endl;         // → {アドレス}/100
         std::cout << "x1 is " << (x1 ? "active"s : "inactive"s) << std::endl; // x1 is active
         // delete raw_pointer; // だめ！
     }
@@ -137,7 +137,7 @@ void learn_unique_ptr()
     // どうしてもdeleteしたい場合は・・・
     // release()の返り値を使う。
     {
-        int *raw_pointer = x1.release(); // 一度releaseするとx1が破棄されるときにdeleteしなくなる
+        int *raw_pointer = x1.release();                                      // 一度releaseするとx1が破棄されるときにdeleteしなくなる
         std::cout << "x1 is " << (x1 ? "active"s : "inactive"s) << std::endl; // x1 is inactive
         delete raw_pointer;                                                   // 呼んであげないとメモリリーク
         std::cout << "x1.release()" << std::endl;
@@ -190,6 +190,7 @@ void learn_shared_ptr()
         std::shared_ptr<MyClass> obj3;
         obj3.reset(new MyClass{15, 1.41}); // obj3.reset()も可能
     }
+
     // 取り扱い: unique_ptrと同じ
     // *  : 中身にアクセスする
     // -> : ポインタの要素にアクセスする
@@ -213,7 +214,11 @@ void learn_shared_ptr()
     // unique_ptrと違い、複数のオブジェクトで共有できる
     // =演算子 : 所有者の追加
     {
-        auto owner1 = std::make_shared<MyClass>(1,2.0);
+        auto owner1 = std::make_shared<MyClass>(1, 2.0);
+
+        // 現在の所有者数を出力できる
+        // ※注意: マルチスレッド下では値を信用しないこと！
+        std::cout << owner1.use_count() << std::endl; // 1
 
         // 共有パターン１：
         {
@@ -222,7 +227,10 @@ void learn_shared_ptr()
             // owner1とowner2は同じポインタを持つ
             std::cout << "address >> owner1:" << owner1.get()
                       << " owner2:" << owner2.get() << std::endl; // address >> owner1:0xZZZZZZ owner2:0xZZZZZZ
-        } // ここでowner2が破棄され、所有者数が -1 される（が、まだ活きている）
+            std::cout << owner2.use_count() << std::endl;         // 2
+        }                                                         // ここでowner2が破棄され、所有者数が -1 される（が、まだ活きている）
+
+        std::cout << owner1.use_count() << std::endl; // 1
 
         // 共有パターン２：
         {
@@ -231,12 +239,13 @@ void learn_shared_ptr()
             // owner1とowner3は同じポインタを持つ
             std::cout << "address >> owner1:" << owner1.get()
                       << " owner3:" << owner3.get() << std::endl; // address >> owner1:0xZZZZZZ owner3:0xZZZZZZ
+            std::cout << owner1.use_count() << std::endl;         // 2
         }                                                         // ここでowner3が破棄され、所有者数が -1 される（が、まだ活きている）
 
         std::cout << "address >> owner1:" << owner1.get() << std::endl; // address >> owner1:0xZZZZZZ
-    } // ここでowner1も所有者から外れ、保持していたMyClassオブジェクトは破棄される
+    }                                                                   // ここでowner1も所有者から外れ、保持していたMyClassオブジェクトは破棄される
 
-    // 所有権の放棄： unique_ptrのrelease()はない
+    // 所有権の放棄： unique_ptrにはあるrelease()はない
     {
         // 所有権の強制解除１
         auto owner1 = std::make_shared<MyClass>(1, 2.0);
@@ -254,7 +263,7 @@ void learn_shared_ptr()
     }
 
     // レアケース
-    // make_～によるstd::vectorの初期化。unique_ptrも同じ
+    // make_～によるstd::vectorの初期化について。unique_ptrも同じ
     {
         // 問題：次の処理は何をする処理でしょうか？
         // a) 10と20を要素に持つ配列の作成
