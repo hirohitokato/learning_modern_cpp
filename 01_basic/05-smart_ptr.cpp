@@ -189,7 +189,7 @@ void learn_shared_ptr()
         std::shared_ptr<MyClass> obj3;
         obj3.reset(new MyClass{15, 1.41});
     }
-    // 取り扱い
+    // 取り扱い: unique_ptrと同じ
     // *  : 中身にアクセスする
     // -> : ポインタの要素にアクセスする
     {
@@ -206,6 +206,30 @@ void learn_shared_ptr()
             std::cout << array[i] << "/" << old_array[i] << ", ";
         }
         std::cout << std::endl;
+    }
+
+    // 共有：
+    // unique_ptrと違い、複数のオブジェクトで共有できる
+    // =演算子 : 所有者の追加
+    {
+        auto owner1 = std::make_shared<MyClass>(1,2.0);
+        {
+            // コピーにより所有者が追加される
+            auto owner2 = owner1;
+            // owner1とowner2は同じポインタを持つ
+            std::cout << "address >> owner1:" << owner1.get()
+                      << " owner2:" << owner2.get() << std::endl; // address >> owner1:0xZZZZZZ owner2:0xZZZZZZ
+        } // ここでowner2が破棄され、所有者数が -1 される（が、まだ活きている）
+        std::cout << "address >> owner1:" << owner1.get() << std::endl; // address >> owner1:0xZZZZZZ
+    } // ここでowner1も所有者から外れ、保持していたMyClassオブジェクトは破棄される
+
+    {
+        // 所有権の強制解除
+        auto owner = std::make_shared<MyClass>(1,2.0);
+        std::cout << "address >> owner:" << owner.get() << std::endl; // address >> owner:0xZZZZZZ
+        owner.reset(); // owner.reset(nullptr);と同じ
+        std::cout << "address >> owner:" << owner.get() << std::endl; // address >> owner:0x0
+        std::cout << "owner1 is " << (owner ? "active"s : "inactive"s) << std::endl; // owner1 is inactive
     }
 }
 
