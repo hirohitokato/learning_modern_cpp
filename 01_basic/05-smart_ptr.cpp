@@ -84,7 +84,7 @@ void learn_unique_ptr()
     {
         auto x = new MyClass();
         std::unique_ptr<MyClass> obj3;
-        obj3.reset(x) // obj3.reset();だとnullptrが渡される
+        obj3.reset(x); // obj3.reset();だとnullptrが渡される
     }
 
     // 取り扱い
@@ -180,8 +180,9 @@ void learn_shared_ptr()
     std::shared_ptr<MyClass> obj2 = std::make_shared<MyClass>(200, 3.14); // コンストラクタへの引数も渡せる
 
     // 配列も作れる
-    std::shared_ptr<int[]> array = std::make_shared<int[]>(10);
+    std::shared_ptr<int[]> array{new int[10]};
     std::shared_ptr<int[]> old_array(new int[10]);
+    // std::shared_ptr<int[]> array = std::make_shared<int[]>(10); // この書き方はC++20から
 
     // あとからセットしたい場合はreset()を使う
     {
