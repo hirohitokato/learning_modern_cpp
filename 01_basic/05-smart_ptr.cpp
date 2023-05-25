@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 using namespace std::literals::string_literals; // "～"sを使えるようにするための宣言
 
 struct MyClass
@@ -179,7 +180,7 @@ void learn_shared_ptr()
     std::shared_ptr<MyClass> obj1 = std::make_shared<MyClass>();
     std::shared_ptr<MyClass> obj2 = std::make_shared<MyClass>(200, 3.14); // コンストラクタへの引数も渡せる
 
-    // 配列も作れる
+    // 配列も作れる: unique_ptrとは配列作成が少し異なる
     std::shared_ptr<int[]> array{new int[10]};
     std::shared_ptr<int[]> old_array(new int[10]);
     // std::shared_ptr<int[]> array = std::make_shared<int[]>(10); // この書き方はC++20から
@@ -187,7 +188,7 @@ void learn_shared_ptr()
     // あとからセットしたい場合はreset()を使う
     {
         std::shared_ptr<MyClass> obj3;
-        obj3.reset(new MyClass{15, 1.41});
+        obj3.reset(new MyClass{15, 1.41}); // obj3.reset()も可能
     }
     // 取り扱い: unique_ptrと同じ
     // *  : 中身にアクセスする
@@ -213,6 +214,8 @@ void learn_shared_ptr()
     // =演算子 : 所有者の追加
     {
         auto owner1 = std::make_shared<MyClass>(1,2.0);
+
+        // 共有パターン１：
         {
             // コピーにより所有者が追加される
             auto owner2 = owner1;
@@ -220,16 +223,52 @@ void learn_shared_ptr()
             std::cout << "address >> owner1:" << owner1.get()
                       << " owner2:" << owner2.get() << std::endl; // address >> owner1:0xZZZZZZ owner2:0xZZZZZZ
         } // ここでowner2が破棄され、所有者数が -1 される（が、まだ活きている）
+
+        // 共有パターン２：
+        {
+            // コンストラクタに渡すことでも所有者が追加される
+            auto owner3 = std::shared_ptr<MyClass>(owner1);
+            // owner1とowner3は同じポインタを持つ
+            std::cout << "address >> owner1:" << owner1.get()
+                      << " owner3:" << owner3.get() << std::endl; // address >> owner1:0xZZZZZZ owner3:0xZZZZZZ
+        }                                                         // ここでowner3が破棄され、所有者数が -1 される（が、まだ活きている）
+
         std::cout << "address >> owner1:" << owner1.get() << std::endl; // address >> owner1:0xZZZZZZ
     } // ここでowner1も所有者から外れ、保持していたMyClassオブジェクトは破棄される
 
+    // 所有権の放棄： unique_ptrのrelease()はない
     {
-        // 所有権の強制解除
-        auto owner = std::make_shared<MyClass>(1,2.0);
-        std::cout << "address >> owner:" << owner.get() << std::endl; // address >> owner:0xZZZZZZ
-        owner.reset(); // owner.reset(nullptr);と同じ
-        std::cout << "address >> owner:" << owner.get() << std::endl; // address >> owner:0x0
-        std::cout << "owner1 is " << (owner ? "active"s : "inactive"s) << std::endl; // owner1 is inactive
+        // 所有権の強制解除１
+        auto owner1 = std::make_shared<MyClass>(1, 2.0);
+        std::cout << "address >> owner1:" << owner1.get() << std::endl;               // address >> owner1:0xZZZZZZ
+        owner1.reset();                                                               // owner.reset(nullptr);と同じ
+        std::cout << "address >> owner1:" << owner1.get() << std::endl;               // address >> owner1:0x0
+        std::cout << "owner1 is " << (owner1 ? "active"s : "inactive"s) << std::endl; // owner1 is inactive
+
+        // 所有権の強制解除２
+        auto owner2 = std::make_shared<MyClass>(1, 2.0);
+        std::cout << "address >> owner2:" << owner2.get() << std::endl;               // address >> owner:0xZZZZZZ
+        owner2 = nullptr;                                                             // これでもOK
+        std::cout << "address >> owner2:" << owner2.get() << std::endl;               // address >> owner2:0x0
+        std::cout << "owner2 is " << (owner2 ? "active"s : "inactive"s) << std::endl; // owner2 is inactive
+    }
+
+    // レアケース
+    // make_～によるstd::vectorの初期化。unique_ptrも同じ
+    {
+        // 問題：次の処理は何をする処理でしょうか？
+        // a) 10と20を要素に持つ配列の作成
+        // b) 値が20となる要素を10個持つ配列の作成
+        auto v_unique = std::make_unique<std::vector<int>>(10, 20);
+        auto v_shared = std::make_shared<std::vector<int>>(10, 20);
+
+        {
+            // 正解はb。std::vector<int> a{10,20};ではない
+
+            // → 10と20を要素に持つ配列のshared_ptrを作りたい場合は次のようにする
+            auto initializer_list = {10, 20};
+            auto v_shared = std::make_shared<std::vector<int>>(initializer_list);
+        }
     }
 }
 
