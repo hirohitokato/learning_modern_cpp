@@ -22,6 +22,7 @@ struct MyClass
 
 void learn_unique_ptr();
 void learn_shared_ptr();
+void learn_shared_ptr_extra();
 void learn_weak_ptr();
 
 int main()
