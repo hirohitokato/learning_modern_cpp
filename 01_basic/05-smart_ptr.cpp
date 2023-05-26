@@ -353,6 +353,7 @@ void learn_weak_ptr()
     // 循環参照せざるを得ない場合にどうする？
     // 所有者の都合で破棄したときに、参照している人は破棄されたことをどうやって確認する？
 
+    // weak_ptr.lock()を呼び出す際、有効か否かを確認すること
     shared_ptr<aircraft> wingMan = pMaverick->myWingMan.lock();
     if (wingMan)
     {
