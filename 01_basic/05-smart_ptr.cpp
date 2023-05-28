@@ -348,6 +348,10 @@ void learn_shared_ptr_extra()
     // １つのポインタに対して異なるグループのshared_ptrを作らない
 }
 
+//
+// 3. std::weak_ptr
+// shared_ptrを弱参照するスマートポインタ。参照先が破棄されたかどうかを知ることができる
+//
 void learn_weak_ptr()
 {
     // 問題
