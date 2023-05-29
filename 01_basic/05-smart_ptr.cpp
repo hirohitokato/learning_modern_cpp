@@ -426,6 +426,10 @@ void learn_weak_ptr()
     // - オブザーバーパターン（Observerからは弱参照にしておけば自殺するだけで勝手に購読解除できる）
     // - GUIパターンでViewとViewController(ViewModel)の相互依存を解消
     //   - View→ViewModel:強参照、ViewModel→View:弱参照
+
+    // Q&A
+    // - 生ポインタの共有とは何が違う？所有権を考えなくて良いのでは？
+    //   - ポインタが破棄されたときにweak_ptr側も使えなくなる。安全。
 }
 
 // scoped/autoは使わない
