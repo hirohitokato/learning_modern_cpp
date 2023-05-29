@@ -331,7 +331,7 @@ void learn_shared_ptr()
     } // 本来ここでSampleのデストラクタが呼ばれるはずだが、呼ばれない!!
     // 解消するためには、次に示すstd::weak_ptrを使う必要がある
 
-    // 使い所
+    // 使いどころ
     // - 大きなオブジェクト
     // - マルチスレッド間で共有
     // - その他
@@ -357,6 +357,8 @@ void learn_weak_ptr()
     // 問題
     // 循環参照せざるを得ない場合にどうする？
     // 所有者の都合で破棄したときに、参照している人は破棄されたことをどうやって確認する？
+    // → weak_ptrの出番
+
 
     // weak_ptr.lock()を呼び出す際、有効か否かを確認すること
     shared_ptr<aircraft> wingMan = pMaverick->myWingMan.lock();
@@ -364,6 +366,19 @@ void learn_weak_ptr()
     {
         cout << wingMan->m_flyCount << endl;
     }
+
+    // アンチパターン
+    // expired()で確認してからロックする
+
+    // メリット:
+    // - 参照カウントを増やさないまま監視できる
+    // - 監視先オブジェクトが破棄されたことが分かる
+    // - weak_ptr使用中に破棄されることを防げる
+
+    // 使いどころ:
+    // - オブザーバーパターン（Observerからは弱参照にしておけば自殺するだけで勝手に購読解除できる）
+    // - GUIパターンでViewとViewController(ViewModel)の相互依存を解消
+    //   - View→ViewModel:強参照、ViewModel→View:弱参照
 }
 
 // scoped/autoは使わない
