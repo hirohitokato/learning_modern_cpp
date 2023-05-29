@@ -407,6 +407,8 @@ void learn_weak_ptr()
             std::cout << *locked_x1 << std::endl; // 100。もしかすると不正アクセスになるかも
         }
     }
+
+    // 参照先が解放されるとweak_ptrも無効になる
     {
         std::weak_ptr<int> weak;
         {
@@ -432,7 +434,8 @@ void learn_weak_ptr()
     //   - ポインタが破棄されたときにweak_ptr側も使えなくなる。安全。
 }
 
-// scoped/autoは使わない
+// 余談：
+// scoped_ptr/auto_ptrもあるが、設計が古く危険なので使わないこと
 
 void func_with_unique_ptr(std::unique_ptr<int> ptr)
 {
