@@ -58,8 +58,11 @@ int main()
     // 2. std::shared_ptr
     std::cout << "--- 2. std::shared_ptr ---" << std::endl;
     learn_shared_ptr();
+    std::cout << "--- 2.1 std::shared_ptr(extra) ---" << std::endl;
+    learn_shared_ptr_extra();
 
     // 3. std::weak_ptr
+    std::cout << "--- 3. std::weak_ptr ---" << std::endl;
     learn_weak_ptr();
 
     return 0;
@@ -262,9 +265,9 @@ void learn_shared_ptr()
             std::cout << "address >> owner1:" << owner1.get()
                       << " owner3:" << owner3.get() << std::endl; // address >> owner1:0xZZZZZZ owner3:0xZZZZZZ
             owner3->value = 5;
-            std::cout << owner1->value << std::endl;              // owner1でも5が出力される
-            std::cout << owner1.use_count() << std::endl;         // 2
-        }                                                         // ここでowner3が破棄され、所有者数が -1 される（が、まだ活きている）
+            std::cout << owner1->value << std::endl;      // owner1でも5が出力される
+            std::cout << owner1.use_count() << std::endl; // 2
+        }                                                 // ここでowner3が破棄され、所有者数が -1 される（が、まだ活きている）
 
         std::cout << "address >> owner1:" << owner1.get() << std::endl; // address >> owner1:0xZZZZZZ
 
@@ -342,10 +345,24 @@ void learn_shared_ptr()
 
 void learn_shared_ptr_extra()
 {
-    // unique_ptrからshared_ptrにする
-    // shared_ptrからunique_ptrはしないほうが良い（設計の問題）
+    // unique_ptrからshared_ptrに変換する
+    {
+        auto unique_x = std::make_unique<int>(42);
+        std::shared_ptr<int> shared1 = std::move(unique_x);
+        std::cout << unique_x.get() << std::endl; // 0x0
+    }
 
-    // １つのポインタに対して異なるグループのshared_ptrを作らない
+    // shared_ptrからunique_ptrも同様にできるが、しないほうが良い（設計の問題）
+    // ※すでに複数所有で設計が進んでいるのでは？
+
+    // NGパターン：
+    {
+        // １つのポインタに対して異なるグループのshared_ptrを作る
+        auto *raw_x = new int{100};
+        auto shared_x1 = std::shared_ptr<int>(raw_x);
+        // auto shared_x2 = std::shared_ptr<int>(raw_x); // NG!アボート確定
+        // shared_x2.release();はないので絶対にアボートしてしまう
+    }
 }
 
 //
@@ -359,16 +376,46 @@ void learn_weak_ptr()
     // 所有者の都合で破棄したときに、参照している人は破棄されたことをどうやって確認する？
     // → weak_ptrの出番
 
+    // 作成: 先にあるshared_ptrから作成する
+    //
+    // std::make_weak<T>()はない
+    auto shared_x1 = std::make_shared<int>(100);
+    auto weak_x1 = std::weak_ptr<int>(shared_x1);
+    std::weak_ptr weak_x2 = shared_x1;
+    std::cout << shared_x1.use_count() << std::endl; // 1(3ではない)
 
+    // 使い方：そのままでは使えない
+    // 1. ロックする
+    // 2. ロックで得られるオブジェクト(shared_ptr)がnullptrでないのを確認
+    // 3. shared_ptrとして使う
     // weak_ptr.lock()を呼び出す際、有効か否かを確認すること
-    shared_ptr<aircraft> wingMan = pMaverick->myWingMan.lock();
-    if (wingMan)
     {
-        cout << wingMan->m_flyCount << endl;
+        std::shared_ptr<int> locked_x1 = weak_x1.lock();
+        if (locked_x1)
+        {
+            std::cout << *locked_x1 << std::endl; // 100
+        }
+        // 一見面倒な使い方だが、lock()している最中は破棄されないことが保証されるので
+        // 安心して使える
     }
-
-    // アンチパターン
-    // expired()で確認してからロックする
+    {
+        // この方法はだめ。expired()を呼んでからlock()するまでの間に
+        // 別スレッドで破棄されているかもしれない。
+        if (weak_x1.expired())
+        {
+            std::shared_ptr<int> locked_x1 = weak_x1.lock();
+            std::cout << *locked_x1 << std::endl; // 100。もしかすると不正アクセスになるかも
+        }
+    }
+    {
+        std::weak_ptr<int> weak;
+        {
+            auto shared = std::make_shared<int>(42);
+            weak = shared;
+            std::cout << (weak.expired() ? "true" : "false") << std::endl; // false
+        } // ここでsharedが解放される → weakも自動的に触れなくなる
+        std::cout << (weak.expired() ? "true" : "false") << std::endl; // true
+    }
 
     // メリット:
     // - 参照カウントを増やさないまま監視できる
