@@ -425,7 +425,7 @@ void learn_weak_ptr()
     // - weak_ptr使用中に破棄されることを防げる
 
     // 使いどころ:
-    // - オブザーバーパターン（Observerからは弱参照にしておけば自殺するだけで勝手に購読解除できる）
+    // - オブザーバーパターン（通知役は弱参照で受信者を管理しておけば、受信者が自殺するだけで勝手に購読解除できる）
     // - GUIパターンでViewとViewController(ViewModel)の相互依存を解消
     //   - View→ViewModel:強参照、ViewModel→View:弱参照
 
