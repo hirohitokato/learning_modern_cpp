@@ -41,6 +41,7 @@ int main()
         // 問題2：
         // 不要になったときにaとbどちらをdeleteすべき？残ったbはどうなる？
         delete a;
+        // bにアクセスすると落ちてしまう
     }
 
     // 所有権を明示し強制できて、安全に使えるようになると嬉しい
@@ -376,27 +377,36 @@ void learn_weak_ptr()
     // 所有者の都合で破棄したときに、参照している人は破棄されたことをどうやって確認する？
     // → weak_ptrの出番
 
+    // 弱参照・強参照： 所有権を持つかどうかの違い
+
     // 作成: 先にあるshared_ptrから作成する
     //
     // std::make_weak<T>()はない
     auto shared_x1 = std::make_shared<int>(100);
+    std::cout << shared_x1.use_count() << std::endl; // 1
+
     auto weak_x1 = std::weak_ptr<int>(shared_x1);
     std::weak_ptr weak_x2 = shared_x1;
     std::cout << shared_x1.use_count() << std::endl; // 1(3ではない)
 
     // 使い方：そのままでは使えない
-    // 1. ロックする
+    // 1. ロックしてshared_ptrを入手
     // 2. ロックで得られるオブジェクト(shared_ptr)がnullptrでないのを確認
     // 3. shared_ptrとして使う
     // weak_ptr.lock()を呼び出す際、有効か否かを確認すること
     {
         std::shared_ptr<int> locked_x1 = weak_x1.lock();
+        std::cout << locked_x1.use_count() << std::endl; // 2
         if (locked_x1)
         {
             std::cout << *locked_x1 << std::endl; // 100
         }
         // 一見面倒な使い方だが、lock()している最中は破棄されないことが保証されるので
         // 安心して使える
+
+        // 注意：
+        // lockして得ると参照カウントが+1されるので、lockしたままにしないこと
+        // あくまで一時的な変数として使う
     }
     {
         // この方法はだめ。expired()を呼んでからlock()するまでの間に
@@ -417,6 +427,12 @@ void learn_weak_ptr()
             std::cout << (weak.expired() ? "true" : "false") << std::endl; // false
         } // ここでsharedが解放される → weakも自動的に触れなくなる
         std::cout << (weak.expired() ? "true" : "false") << std::endl; // true
+
+        std::shared_ptr<int> locked = weak.lock();
+        if (locked) // ここには入らない
+        {
+            std::cout << *locked << std::endl; // ---
+        }
     }
 
     // メリット:
