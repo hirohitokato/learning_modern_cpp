@@ -14,4 +14,4 @@ C++17以降のプログラミング環境にふさわしい知識・技術をま
 1. 2023/5/17 03-technique/01-include_order.md
 1. 2023/5/24 01_basic/05-smart_ptr.cpp - unique_ptr
 1. 2023/5/26 01_basic/05-smart_ptr.cpp - shared_ptr
-1. 2023/5/31 01_basic/05-smart_ptr.cpp - weak_ptr
+1. 2023/5/31 01_basic/05-smart_ptr.cpp, 03-technique/02-smartptr_guidelines.md - weak_ptr and its guidelines
