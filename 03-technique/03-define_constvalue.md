@@ -74,3 +74,6 @@ const std::string MyLibrary::LOG_FILENAME;
 char name1[MyLibrary::MaxNameLength]; // コンパイルエラー！値が分からない
 ```
 
+### 補足
+
+`<limits>`ヘッダによって使える`std::numeric_limits`では、constexprを使って定数表現の評価もできるようになっているようす。しかし自分のコードでの実現方法が分かりませんでした・・・。
