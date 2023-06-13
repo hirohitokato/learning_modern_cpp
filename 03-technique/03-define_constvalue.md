@@ -1,4 +1,13 @@
 # 定数を定義するときのポイント
+# 参考書籍： マーティン・レディ著、ホジソンますみ訳『C++のためのAPIデザイン』
+
+パブリック/インターナルな定数を定義し、コード中に値のハードコードを避けたいときのポイント。
+
+```cpp
+// これらをどう書くか
+#define SOMETHING_CONSTANT (42)
+const int FOO_MESSAGE_SIZE = 64;
+```
 
 * まずは`#define`による定義を避けられないか考える
 * `extern`で宣言と定義とを分ける
@@ -6,19 +15,22 @@
     * ヘッダファイルには `extern const int FOOBAR;` と書いておく(宣言)
         * .cppファイルに `const int FOOBAR = 4649;` と書く(定義)
 
-## `#define`の問題点
+## 【課題】`#define`の問題点
 
 便利なんだけれど・・・
 
 * ただ置き換えるだけなので危険がいっぱい
-* 変数マクロの場合、型が分からない
+* ライブラリの場合、実装の詳細を漏らしてしまうことになる
+* 使用している変数の型が分からない・型チェックもない
+* ただの置き換えなのでデバッグ時のシンボル情報が残らない
 * namespaceに入れられないのでグローバル名前空間を汚染しまくる
 
-## constを使った方法
+## 【解決策】constを使った方法
 
 ### 実現方法1
 
 ヘッダファイルで`extern`宣言をする。
+
 ```cpp
 // my_library.hファイル
 #include <string>
@@ -52,7 +64,7 @@ std::cout << MyLibrary::LOG_FILENAME << std::endl;
 
 ### 実現方法2
 
-クラスの静的変数として宣言する。
+namespaceの代わりにクラスの静的変数として宣言する。
 
 ```cpp
 // my_library.hファイル
@@ -83,7 +95,9 @@ std::cout << MyLibrary::LOG_FILENAME << std::endl;
   ：
 ```
 
-## メリット
+クラスの静的変数にした場合は `using namespace MyLibrary` と省略させられなくなるので、namespaceとどちらにするかはケースバイケース。
+
+## 宣言と実装を分けるメリット
 
 * ビルド時間を短くできる
     * ヘッダファイルの更新 → includeしている全ファイルで再ビルドが走る
@@ -91,7 +105,7 @@ std::cout << MyLibrary::LOG_FILENAME << std::endl;
 * バイナリサイズが小さくなる(塵も積もれば…)
     * 各objファイルが共通の値を見に行くため
 
-## デメリット
+## 宣言と実装を分けるデメリット
 
 * 宣言と実装を分けると定数表現を評価できなくなる
 
@@ -108,9 +122,42 @@ char name2[SIZE]{}; // 定義が見えている状態ならOK
 
 ## その他のアイデア
 
+* お互いに独立した数値で、同じグループにあるものは`enum`で定数定義する。
+
+```cpp
+// Not good
+#define ALIGNMENT_CENTER 0
+#define ALIGNMENT_LEFT   1
+#define ALIGNMENT_RIGHT  2
+
+// better
+enum Alignment: int {
+    Center,
+    Left,
+    Right,
+};
+```
+
 * `constexpr`/`consteval`や`inline`変数の使用も考える
-    * 宣言と実装を分けたときの定数表現には対応していないけれど、今後の標準になるので
-    * とりあえずは`const`を`constexpr`に変えてみよう
+    * 宣言と実装を分けることはできないけれど、今は積極的にconstexpr/constevalを使っていくのがスタイル
+    * とりあえずは`const`を`constexpr`に変えてみることから慣れてみよう
+
+```cpp
+namespace MyLibrary {
+    // constexpr(C++20はconstevalも)を付ける
+    constexpr int GetSize(int count) { return count * 3; }
+}
+
+int main() {
+    using namespace MyLibrary;
+
+    // 関数の戻り値を定数定義に使える
+    char myarray[GetSize(3)]{};
+    std::cout << sizeof(myarray) / sizeof(char) << std::endl; // 9
+
+    return 0;
+}
+```
 
 ### 補足
 
