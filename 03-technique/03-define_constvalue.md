@@ -1,6 +1,8 @@
 # 定数を定義するときのポイント
 # 参考書籍： マーティン・レディ著、ホジソンますみ訳『C++のためのAPIデザイン』
 
+![https://www.sbcr.jp/product/4797369151/](https://www.sbcr.jp/wp-content/uploads/product/4797369151-480x596.jpg)
+
 パブリック/インターナルな定数を定義し、コード中に値のハードコードを避けたいときのポイント。
 
 ```cpp
@@ -50,15 +52,16 @@ namespace MyLibrary {
 namespace MyLibrary {
     const int FooValue = 42;
     const int MaxNameLength = 255;
-    const std::string LOG_FILENAME;
+    const std::string LOG_FILENAME = "Hello!"s;
 }
 
 //-------------------------
 
 // main.cppファイル
   ：
-auto value = MyLibrary::FooValue;
-std::cout << MyLibrary::LOG_FILENAME << std::endl;
+using namespace MyLibrary;
+auto value = FooValue;
+std::cout << LOG_FILENAME << std::endl;
   ：
 ```
 
@@ -74,7 +77,7 @@ class MyLibrary {
 public:
     static const int FooValue;
     static const int MaxNameLength;
-    static const std::string LOG_FILENAME;
+    static const std::string LOG_FILENAME = "Hello!"s;
 };
 
 //-------------------------
@@ -103,7 +106,7 @@ std::cout << MyLibrary::LOG_FILENAME << std::endl;
     * ヘッダファイルの更新 → includeしている全ファイルで再ビルドが走る
     * cppファイルの更新だけなら同cppファイルの再コンパイルだけでOK
 * バイナリサイズが小さくなる(塵も積もれば…)
-    * 各objファイルが共通の値を見に行くため
+    * 各objファイルが共通の値だけれど、各ファイルで実体が定義され、それを見に行くことになるため
 
 ## 宣言と実装を分けるデメリット
 
