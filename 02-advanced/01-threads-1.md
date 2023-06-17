@@ -32,6 +32,7 @@ Windows/Linux/macOSなどのOSにおいて、スレッドは特定のプロセ�
     * ⇔スレッドは同一プロセス(システム)内で仮想アドレス空間を共有する
 * プロセスの方がスレッドよりも生成コスト・切替コストが大きい
     * ポインタの差し替えだけでなくCPU,TLBキャッシュクリアも含むため
+        * TLB: Translation Lookaside Buffer
     * 参考： https://naoya-2.hatenadiary.org/entry/20071010/1192040413
 
 |スレッド|プロセス|
