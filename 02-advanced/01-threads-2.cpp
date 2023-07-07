@@ -16,6 +16,7 @@
 
 namespace
 {
+    // 排他変数はスレッド間で共有できるスコープに置いておく
     std::mutex _printMutex;
 }
 
@@ -56,6 +57,20 @@ struct ThreadableClass
         // 関数オブジェクトとしてobj()で呼べるようにしておくと、スレッドの
         // エントリポイントとしてメンバー関数を渡せる
         //
+        std::stringstream ss;
+        ss << "  | Runs on thread with value(" << _x << ")"; // メンバー変数にもアクセス可
+        print_threadsafe(ss.str());
+    }
+};
+
+struct ThreadableClass2
+{
+    int _x;
+
+    ThreadableClass2(int x) : _x(x) {}
+
+    void member_function()
+    {
         std::stringstream ss;
         ss << "  | Runs on thread with value(" << _x << ")"; // メンバー変数にもアクセス可
         print_threadsafe(ss.str());
@@ -104,7 +119,9 @@ int main()
     }
 
     // スレッドをオブジェクトのメソッドとして起動する
+    // (メンバー関数はそのままだと渡せないので、ちょっとしたテクニックが必要)
     {
+        // 1.関数オブジェクトとして用意する
         ThreadableClass myobj{42};
 
         // スレッドの作成と実行開始
@@ -114,6 +131,21 @@ int main()
         print_threadsafe("Output on main thread.");
 
         my_thread.join();
+
+        /*----------------------------------------*/
+
+        // 2.lambdaを介して渡す
+        ThreadableClass2 myobj2{193};
+
+        // スレッドの作成と実行開始
+        // このときmyobj()、つまりmyobjの`void operator()()`の処理が呼ばれる
+        std::thread my_thread2{[&myobj2]()
+                               { myobj2.member_function(); }};
+        my_thread2.join();
+
+        // 他にも https://q7z.hatenablog.com/entry/2014/05/24/092127
+        // にあるようなthisポインタを渡す方法もあるが、lambdaがあるなら
+        // それを使った方がよいと思う
     }
 
     // スレッドの実行結果を受け取る
@@ -135,10 +167,10 @@ int main()
         std::cout << "result is " << result << std::endl;
     }
 
-    // スレッド情報の入手
+    // 補足:スレッド情報の入手
     {
         // ハードウェアでサポートされているCPUスレッドの数
-        // (M2 MacBookだと8が返る)
+        // (M2 MacBook/ DAIV 4Nだと8が返る)
         std::cout << "concurrency = " << std::thread::hardware_concurrency() << std::endl;
     }
     return 0;
