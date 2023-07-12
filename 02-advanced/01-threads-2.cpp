@@ -97,7 +97,7 @@ int main()
         std::thread my_thread{my_function};
 
         // 【注意!】
-        // 下の出力処理はスレッドセーフではないため、他のスレッドとで出力が混じることがあります
+        // 下の出力処理はスレッドセーフではないため、他のスレッドとで出力が混じることがある
         std::cout << "Output on main thread." << std::endl;
 
         // スレッド終了の待ち合わせ
