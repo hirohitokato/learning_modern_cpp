@@ -110,7 +110,7 @@ int main()
         auto ptr = std::make_unique<TrivialClass>();
 
         // スレッドの作成と実行開始。
-        // このとき関数の引数で値を渡せる
+        // このとき関数の引数で値を渡せる。unique_ptrの場合はstd::move()で渡す
         std::thread my_thread{my_function2, 193, std::move(ptr)};
 
         print_threadsafe("Output on main thread.");
