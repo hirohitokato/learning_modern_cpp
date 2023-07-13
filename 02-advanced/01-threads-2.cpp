@@ -14,7 +14,7 @@
 #include <mutex>
 #include <future>
 
-namespace
+namespace // namespaceだけ書くとファイル内でしか見えない変数を定義できる
 {
     // 排他変数はスレッド間で共有できるスコープに置いておく
     std::mutex _printMutex;
@@ -101,6 +101,7 @@ int main()
         std::cout << "Output on main thread." << std::endl;
 
         // スレッド終了の待ち合わせ
+        // もしjoinしないままスコープを抜けると例外発生
         my_thread.join();
         std::cout << "thread joined." << std::endl;
     }
@@ -115,13 +116,13 @@ int main()
 
         print_threadsafe("Output on main thread.");
 
-        my_thread.join(); // もしjoinしないままスコープを抜けるとSIGABRT発生
+        my_thread.join(); // もしjoinしないままスコープを抜けると例外発生
     }
 
     // スレッドをオブジェクトのメソッドとして起動する
-    // (メンバー関数はそのままだと渡せないので、ちょっとしたテクニックが必要)
+    // (メンバー関数はそのままだと呼べないため、ちょっとしたテクニックが必要)
     {
-        // 1.関数オブジェクトとして用意する
+        // a) 関数オブジェクトとして用意する
         ThreadableClass myobj{42};
 
         // スレッドの作成と実行開始
@@ -134,11 +135,11 @@ int main()
 
         /*----------------------------------------*/
 
-        // 2.lambdaを介して渡す
+        // b) lambdaを介して渡す
         ThreadableClass2 myobj2{193};
 
         // スレッドの作成と実行開始
-        // このときmyobj()、つまりmyobjの`void operator()()`の処理が呼ばれる
+        // myobj2がキャプチャされたコンテキストで呼ばれることになる
         std::thread my_thread2{[&myobj2]()
                                { myobj2.member_function(); }};
         my_thread2.join();
@@ -152,8 +153,8 @@ int main()
     {
         // promiseオブジェクトを渡しておき、そのfutureオブジェクト経由で値を受け渡しする
 
-        std::promise<int> p{};                    // 1) 受け渡し役になるオブジェクトを準備
-        std::future<int> future = p.get_future(); // 2) スレッドに渡す前にfutureを入手しておく
+        std::promise<int> p{};                    // 1) 受け渡し役になるpromiseオブジェクトを準備
+        std::future<int> future = p.get_future(); // 2) promiseをスレッドに渡す前にfutureを入手しておく
 
         // 3) スレッドの作成と実行開始
         // promiseオブジェクトはstd::move()で所有権を手放しておくと安全
