@@ -86,7 +86,7 @@ void my_function3(std::promise<int> p, int arg)
     ss << "  | Runs on thread: arg(" << arg << ") * 10 = " << result;
 
     // 結果をセット
-    p.set_value(result);
+    p.set_value(result); // これによってfuture.get()呼び出しから返るようになる
 }
 
 int main()
@@ -111,7 +111,7 @@ int main()
         auto ptr = std::make_unique<TrivialClass>();
 
         // スレッドの作成と実行開始。
-        // このとき関数の引数で値を渡せる。unique_ptrの場合はstd::move()で渡す
+        // コンストラクタ引数で値を渡せる。unique_ptrの場合はstd::move()で渡すと安全
         std::thread my_thread{my_function2, 193, std::move(ptr)};
 
         print_threadsafe("Output on main thread.");
@@ -160,11 +160,12 @@ int main()
         // promiseオブジェクトはstd::move()で所有権を手放しておくと安全
         std::thread my_thread{my_function3, std::move(p), 193};
 
-        // 4) 終了待ち
+        // 4) 結果の受け取り
+        int result = future.get(); // set_value()されるまではスレッドを専有したまま止まる。その後1930が得られる
+
+        // 5) 終了待ち
         my_thread.join();
 
-        // 5) 結果の受け取り
-        int result = future.get(); // 1930が得られる
         std::cout << "result is " << result << std::endl;
     }
 
