@@ -172,7 +172,7 @@ int main()
     // 補足:スレッド情報の入手
     {
         // ハードウェアでサポートされているCPUスレッドの数
-        // (M2 MacBook/ DAIV 4Nだと8が返る)
+        // (M2 MacBook/ DAIV 4N(どちらも4コア8スレッド)だと8が返る)
         std::cout << "concurrency = " << std::thread::hardware_concurrency() << std::endl;
     }
     return 0;
