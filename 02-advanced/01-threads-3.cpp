@@ -19,6 +19,7 @@ void function_1a()
 
     if (shared_value > 5)
     {
+        m.unlock();
         return;
     }
     std::cout << "function_1a: " << shared_value << std::endl;
@@ -67,25 +68,6 @@ void function_2a()
     function_2b(); // 同じrmをロックする関数を呼んでも安全
 }
 
-void function_3a()
-{
-    // 読み出す場合にはstd::shared_lockを使う（他スレッドと同時に入れる）
-    std::shared_lock lock{sm};
-    std::cout << shared_value << std::endl; // この処理は非スレッドセーフなので注意
-}
-
-void function_3b()
-{
-    for (size_t i = 0; i < 10; i++)
-    {
-        // 書き込む場合にはstd::lock_guardで排他する（function_3aは入れない）
-        std::lock_guard lock{sm};
-        shared_value++;
-        std::cout << "increment shared_value:" << shared_value << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds{30});
-    }
-}
-
 int main()
 {
     {
@@ -109,7 +91,7 @@ int main()
     {
         // 再帰ロックを使うと、ロックを同じスレッドで連続して獲得できる
         std::thread t1{function_2a};
-        std::thread t2{function_2a};
+        std::thread t2{function_2a}; // 別スレッドになるのでt1とは排他する
 
         t2.join();
         t1.join();
@@ -123,11 +105,26 @@ int main()
         // (大量の)リーダースレッド
         for (size_t i = 0; i < 10; i++)
         {
-            std::thread reader{function_3a};
-            threads.push_back(std::move(reader));
+            std::thread rdr{[&]()
+                            {
+                                // 読み出す場合にはstd::shared_lockを使う（他スレッドと同時に入れる）
+                                std::shared_lock lock{sm};
+                                std::cout << shared_value << std::endl; // この処理は非スレッドセーフなので注意
+                            }};
+            threads.push_back(std::move(rdr));
         }
 
-        std::thread writer{function_3b};
+        std::thread writer{[&]()
+                           {
+                               for (size_t i = 0; i < 10; i++)
+                               {
+                                   // 書き込む場合にはstd::lock_guardで排他する（rdrスレッドは入れない）
+                                   std::lock_guard lock{sm};
+                                   shared_value++;
+                                   std::cout << "increment shared_value:" << shared_value << std::endl;
+                                   std::this_thread::sleep_for(std::chrono::milliseconds{30});
+                               }
+                           }};
 
         for (auto &thread : threads)
         {
