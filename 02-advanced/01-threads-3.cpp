@@ -48,9 +48,9 @@ void function_2b()
     std::cout << std::this_thread::get_id() << ": " << __func__ << std::endl;
 }
 
-void function_2c()
+void function_2b_dash()
 {
-    // function_2bと同じ処理をlock_guardを使わないで書いた場合
+    // 参考function_2bと同じ処理をlock_guardを使わないで書いた場合
     rm.lock();
     rm.lock();
 
