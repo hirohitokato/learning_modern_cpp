@@ -50,7 +50,7 @@ void function_2b()
 
 void function_2b_dash()
 {
-    // 参考function_2bと同じ処理をlock_guardを使わないで書いた場合
+    // 参考: function_2bと同じ処理をlock_guardを使わないで書いた場合
     rm.lock();
     rm.lock();
 
