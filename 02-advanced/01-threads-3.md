@@ -2,17 +2,17 @@
 
 ## ロックの種類
 
-
 |型|ver.|説明|
 |---|---|---|
 |`std::mutex`||ロック/非ロックで排他領域を作り出せる|
 |`std::recursive_mutex`||同じスレッドであれば何回でも`lock()`できる|
-|`std::shared_mutex`|C++17|リーダーライターロックを提供
-|`std::shared_timed_mutex`|C++14|タイマー付のリーダーライターロックを提供
-|`std::binary_semaphore`|C++20|バイナリセマフォ。`counting_semaphore<1>`相当|
+|`std::shared_mutex`|C++17|リーダーライターロックを提供|
+|`std::shared_timed_mutex`|C++14|タイマー付のリーダーライターロックを提供|
 |`std::counting_semaphore`|C++20|計数セマフォ|
+|`std::binary_semaphore`|C++20|バイナリセマフォ。`counting_semaphore<1>`と同じ|
 
-* `std::recursive_mutex`はスレッドがロックを所有するため、別のスレッドから`unlock()`はできない点がセマフォと異なる
+* `std::recursive_mutex`はスレッドがロックを所有する仕組みのため、別のスレッドで`unlock()`しても効果なし
+* `std::binary_semaphore`/`std::counting_semaphore`は別スレッドからの`release()`が可能
 
 # ロック獲得/解放処理の便利メソッド
 
