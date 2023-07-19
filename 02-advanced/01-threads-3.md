@@ -14,7 +14,7 @@
 * `std::recursive_mutex`はスレッドがロックを所有する仕組みのため、別のスレッドで`unlock()`しても効果なし
 * `std::binary_semaphore`/`std::counting_semaphore`は別スレッドからの`release()`が可能
 
-# ロック獲得/解放処理の便利メソッド
+## ロック獲得/解放処理の便利メソッド
 
 RAIIあるいは[Scoped Locking Pattern](https://www.dre.vanderbilt.edu/~schmidt/PDF/ScopedLocking.pdf)と呼ばれる方法で、スコープの寿命にロック獲得/解放を同期させるための管理メソッド群が用意されている。
 
