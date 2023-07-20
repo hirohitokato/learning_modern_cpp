@@ -100,25 +100,26 @@ int main()
     {
         // リーダーライター(Reader-Writer)ロック
         // 読み書きの頻度が非対称(読み>書き)の場合にパフォーマンス低下を抑えられる
-        std::vector<std::thread> threads;
+        // ※ここでいう読み書きは「読み：値の変更などを伴わない軽い処理」「書き：値の変更を伴う重い処理」を一般的に表す
 
         // (大量の)リーダースレッド
+        std::vector<std::thread> threads;
         for (size_t i = 0; i < 10; i++)
         {
-            std::thread rdr{[&]()
-                            {
-                                // 読み出す場合にはstd::shared_lockを使う（他スレッドと同時に入れる）
-                                std::shared_lock lock{sm};
-                                std::cout << shared_value << std::endl; // この処理は非スレッドセーフなので注意
-                            }};
-            threads.push_back(std::move(rdr));
+            std::thread reader{[&]()
+                               {
+                                   // 読み出す場合にはstd::shared_lockを使う（他スレッドと同時に入れる）
+                                   std::shared_lock lock{sm};
+                                   std::cout << shared_value << std::endl; // この処理は非スレッドセーフなので注意
+                               }};
+            threads.push_back(std::move(reader));
         }
 
         std::thread writer{[&]()
                            {
                                for (size_t i = 0; i < 10; i++)
                                {
-                                   // 書き込む場合にはstd::lock_guardで排他する（rdrスレッドは入れない）
+                                   // 書き込む場合にはstd::lock_guardで排他する（readerスレッドも入れない）
                                    std::lock_guard lock{sm};
                                    shared_value++;
                                    std::cout << "increment shared_value:" << shared_value << std::endl;
