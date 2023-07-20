@@ -70,3 +70,4 @@ RAIIあるいは[Scoped Locking Pattern](https://www.dre.vanderbilt.edu/~schmidt
 |`std::scoped_lock`|C++17|複数のミューテックスをまとめてロック/解放できる|
 
 ※ `std::shared_mutex`を占有してロックしたい場合は他の`std::lock_guard`/`unique_lock`/`scoped_lock`を使えば良い
+* `std::lock_guard`は今後`std::scoped_lock`に取って代わるという話もあるので、使い慣れておくと良い
