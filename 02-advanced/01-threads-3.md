@@ -12,7 +12,7 @@
 |型|ver.|説明|
 |---|---|---|
 |`std::mutex`||ロック/アンロックで排他領域を作り出せる|
-|`std::recursive_mutex`||同じスレッドであれば何回でも`lock()`できる。Javaの`synchronized{}`、C#の`lock(〜){}`と同じ|
+|`std::recursive_mutex`||同じスレッドであれば何回でも`lock()`できる。Javaの`synchronized{}`、C#の`lock(obj){}`と同じ|
 |`std::shared_mutex`|C++17|いわゆるリーダーライターロックを提供|
 |`std::shared_timed_mutex`|C++14|タイマー付のリーダーライターロックを提供|
 |`std::counting_semaphore`|C++20|計数セマフォ|
@@ -36,7 +36,7 @@
 
 ### セマフォ
 
-「何人までが同時にクリティカルセクションに入れる」を実現する仕組み。
+「何人まで同時にクリティカルセクションに入れる」を実現する仕組み。（ミューテックスは同時に入れるのは１人だけ）
 
 * セマフォの獲得(`acquire()`)： 排他処理権の獲得。内部カウンタ－１。内部カウンタが０のときは待ち合わせ
 * セマフォの解放(`release()`)： 排他処理権の解放。内部カウンタ＋１
@@ -69,5 +69,5 @@ RAIIあるいは[Scoped Locking Pattern](https://www.dre.vanderbilt.edu/~schmidt
 |`std::shared_lock`|C++14|`std::shared_mutex`を共有ロック/解放する|
 |`std::scoped_lock`|C++17|複数のミューテックスをまとめてロック/解放できる|
 
-※ `std::shared_mutex`を占有してロックしたい場合は他の`std::lock_guard`/`unique_lock`/`scoped_lock`を使えば良い
-* `std::lock_guard`は今後`std::scoped_lock`に取って代わるという話もあるので、使い慣れておくと良い
+* ※ `std::shared_mutex`を占有してロックしたい場合は他の`std::lock_guard`/`unique_lock`/`scoped_lock`を使えば良い
+* ※ `std::lock_guard`は今後`std::scoped_lock`に取って代わるという話もあるので、使い慣れておくと良い

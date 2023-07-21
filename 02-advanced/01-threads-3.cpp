@@ -120,7 +120,7 @@ int main()
                                for (size_t i = 0; i < 10; i++)
                                {
                                    // 書き込む場合にはstd::lock_guardで排他する（readerスレッドも入れない）
-                                   std::lock_guard lock{sm};
+                                   std::scoped_lock lock{sm};
                                    shared_value++;
                                    std::cout << "increment shared_value:" << shared_value << std::endl;
                                    std::this_thread::sleep_for(std::chrono::milliseconds{30});
