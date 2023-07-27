@@ -1,6 +1,8 @@
 #include <thread>
 #include <mutex>
 #include <shared_mutex>
+#include <semaphore>
+#include <latch>
 #include <iostream>
 #include <vector>
 #include <chrono>
@@ -8,6 +10,8 @@
 std::mutex m;
 std::recursive_mutex rm;
 std::shared_mutex sm;
+std::counting_semaphore sem{0};
+std::latch ltch{10};
 
 int shared_value = 0;
 
@@ -66,6 +70,27 @@ void function_2a()
     std::lock_guard lock{rm};
     std::cout << std::this_thread::get_id() << ": " << __func__ << std::endl;
     function_2b(); // 同じrmをロックする関数を呼んでも安全
+}
+
+void function_3(int x)
+{
+    // 待機
+    std::cout << "Wait processing ... " << x << std::endl;
+    sem.acquire();
+
+    // 処理
+    std::cout << "Start processing ... " << x << std::endl;
+}
+
+void function_4(int x)
+{
+    // なにかの初期処理
+    std::cout << "Start processing ... " << x << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds{100});
+
+    // 処理が完了したのでラッチをカウントダウンする
+    std::cout << "Finished. " << x << std::endl;
+    ltch.count_down();
 }
 
 int main()
@@ -132,6 +157,59 @@ int main()
             thread.join();
         }
         writer.join();
+    }
+
+    {
+        // セマフォの使用例（昔ファーム開発で書いたコード） (C++20)
+        const auto num_threads = 10;
+
+        // 他のスレッドからロック量をコントロールできるので色々使いやすい
+        std::vector<std::thread> threads;
+        for (size_t i = 0; i < num_threads; i++)
+        {
+            // スレッドを起動するが、まだ処理を開始せず待ち合わせる
+            std::thread t{function_3, i};
+            threads.push_back(std::move(t));
+        }
+
+        // なにかのスレッド開始前に必要な初期処理
+        std::this_thread::sleep_for(std::chrono::seconds{1});
+
+        // 眠っているスレッドをすべて起こす
+        std::cout << "Start!" << std::endl;
+        for (size_t i = 0; i < num_threads; i++)
+        {
+            sem.release();
+        }
+
+        for (auto &thread : threads)
+        {
+            thread.join();
+        }
+    }
+
+    {
+        // ラッチの使用例（昔ファーム開発で書いたコード） (C++20)
+        const auto num_threads = 10;
+
+        // セマフォ同様に他のスレッドからロック量をコントロールできるので色々使いやすい
+        std::vector<std::thread> threads;
+        for (size_t i = 0; i < num_threads; i++)
+        {
+            // 初期化処理(を模した)スレッドを起動
+            std::thread t{function_4, i};
+            threads.push_back(std::move(t));
+        }
+
+        // 全スレッドの終了を待つ
+        ltch.wait();
+
+        std::cout << "All tasks are finished." << std::endl;
+
+        for (auto &thread : threads)
+        {
+            thread.join();
+        }
     }
 
     return 0;
