@@ -74,22 +74,22 @@ void function_2a()
 
 void function_3(int x)
 {
-    // 待機
-    std::cout << "Wait processing ... " << x << std::endl;
+    // 許可が下りるまで（セマフォを獲得できるまで）待機
+    std::cout << "[semaphore] Wait processing ... " << x << std::endl;
     sem.acquire();
 
-    // 処理
-    std::cout << "Start processing ... " << x << std::endl;
+    // 処理の開始
+    std::cout << "[semaphore] Start processing ... " << x << std::endl;
 }
 
 void function_4(int x)
 {
-    // なにかの初期処理
-    std::cout << "Start processing ... " << x << std::endl;
+    // なにかの初期処理を先行して実施
+    std::cout << "[latch] Start processing ... " << x << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds{100});
 
-    // 処理が完了したのでラッチをカウントダウンする
-    std::cout << "Finished. " << x << std::endl;
+    // 処理が完了したことを通達。ラッチをカウントダウンする
+    std::cout << "[latch] Finished. " << x << std::endl;
     ltch.count_down();
 }
 
@@ -159,15 +159,17 @@ int main()
         writer.join();
     }
 
+    std::cout << "----------------------------------" << std::endl;
+
     {
         // セマフォの使用例（昔ファーム開発で書いたコード） (C++20)
         const auto num_threads = 10;
 
-        // 他のスレッドからロック量をコントロールできるので色々使いやすい
+        // 他のスレッドからロック量をコントロールできるので色々使いまわしやすい
         std::vector<std::thread> threads;
         for (size_t i = 0; i < num_threads; i++)
         {
-            // スレッドを起動するが、まだ処理を開始せず待ち合わせる
+            // スレッドを起動・・・ただしまだ処理を開始せず待ち合わせる
             std::thread t{function_3, i};
             threads.push_back(std::move(t));
         }
@@ -176,7 +178,7 @@ int main()
         std::this_thread::sleep_for(std::chrono::seconds{1});
 
         // 眠っているスレッドをすべて起こす
-        std::cout << "Start!" << std::endl;
+        std::cout << "Start workers." << std::endl;
         for (size_t i = 0; i < num_threads; i++)
         {
             sem.release();
@@ -188,8 +190,10 @@ int main()
         }
     }
 
+    std::cout << "----------------------------------" << std::endl;
+
     {
-        // ラッチの使用例（昔ファーム開発で書いたコード） (C++20)
+        // ラッチの使用例 (C++20)
         const auto num_threads = 10;
 
         // セマフォ同様に他のスレッドからロック量をコントロールできるので色々使いやすい
@@ -204,6 +208,7 @@ int main()
         // 全スレッドの終了を待つ
         ltch.wait();
 
+        // 残りの処理を開始
         std::cout << "All tasks are finished." << std::endl;
 
         for (auto &thread : threads)
