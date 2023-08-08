@@ -83,6 +83,19 @@ int main()
         future1.get();
         // future1.get();ここで例外発生するのでコメントアウト
     }
+    {
+        // b) asyncの場合に、得られたfutureオブジェクトで待ち合わせをしないと
+        //    破棄されるタイミングでスレッド終了を待つことになるので注意。
+        //    （スレッドがストップしたままだとプログラムが停止してしまう）
+        {
+            auto future = std::async(std::launch::async, []
+                                     {
+                                        std::this_thread::sleep_for(std::chrono::seconds{3});
+                                        std::cout << "task finished." << std::endl; });
+        } // get()を呼ばないままスコープを抜けると、futureのデストラクタで待ちが発生
+
+        std::cout << "end" << std::endl; // ここには3秒後にならないと到達しない
+    }
 
     return 0;
 }
