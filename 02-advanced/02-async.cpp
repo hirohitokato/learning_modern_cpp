@@ -43,7 +43,7 @@ int main()
         {
             // 別スレッドで実行された処理を待ち受ける
             auto sum = future.get();
-            std::cout << sum << std::endl;
+            std::cout << sum << std::endl; // 15
         }
         catch (...)
         {
@@ -64,7 +64,7 @@ int main()
         try
         {
             // get()/wait()の呼び出しと同時に処理を実行開始する
-            auto sum = future.get();
+            auto sum = future.get(); // 15
             std::cout << sum << std::endl;
         }
         catch (...)
@@ -84,9 +84,9 @@ int main()
         // future1.get();ここで例外発生するのでコメントアウト
     }
     {
-        // b) asyncの場合に、得られたfutureオブジェクトで待ち合わせをしないと
-        //    破棄されるタイミングでスレッド終了を待つことになるので注意。
-        //    （スレッドがストップしたままだとプログラムが停止してしまう）
+        // b) std::launch::asyncの場合に、得られたfutureオブジェクトでget()をしないと
+        //    futureオブジェクトが破棄されるタイミングでスレッド終了を待つことになるので注意。
+        //    （つまり、スレッドがストップしたままにしておくとプログラムが停止してしまう）
         {
             auto future = std::async(std::launch::async, []
                                      {
