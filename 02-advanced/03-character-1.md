@@ -30,15 +30,23 @@ VC++2023のcl.exeはソースファイルがSJISで書かれている・SJISの�
 
 * → UTF-8, UTF-16で保存したファイルをコンパイルできない
 
-cl.exeにはソース文字セット(入力)と実行文字セット(出力)を指定するオプションがある。
+MSVC(cl.exe)やGCC,Clangにはソース文字セット(入力)と実行文字セット(出力)を指定するオプションがある。
 
-* `/source-charset:utf-8`: ソースコードがUTF-8で書かれているとみなしてコンパイルする
-* `/execution-charset:utf-8`: 実行時に使う文字列をUTF-8として出力する
-* `/utf-8`: `source-～`と`execution-～`の同時指定
+|オプション|MSVC|GCC|
+|---|---|---|
+|ソースファイルのエンコーディング指定|`/source-charset:utf-8`|`-finput-charset=utf-8`|
+|実行時に使う文字列のエンコーディング指定|`/execution-charset:utf-8`|`-fexec-charset=cp932`|
+|入出力のエンコーディング同時指定(UTF-8の場合)|`/utf-8`|-|
 
-たとえば`/source-charset:utf-8`だけを指定した場合、ソースに書かれた文字列リテラルはバイナリの中ではSJISに変換され定義されることになる。
+**使用例:**
 
-* 厳密にはUTF-8で保存する際にBOMをつければ認識してくれる・・・が、使わないよね
+ソースファイルに書かれた文字列リテラルはUTF-8として解釈してコンパイル  
+コンパイル後のバイナリ中ではSJISに変換された文字列として定義
+
+* `cl.exe /source-charset:utf-8 main.cpp`
+* `gcc -finput-charset=utf-8 -fexec-charset=cp932 sample.cpp`
+
+MSVCの場合、UTF-8で保存する際にBOMをつければ認識してくれる・・・が、BOMをつけるのはあまり好きではない(個人の意見です)
 
 
 * ファイル
@@ -48,3 +56,56 @@ cl.exeにはソース文字セット(入力)と実行文字セット(出力)を�
     * string
     * wstring
     * u8string
+    * ATL::CString
+    * LPCSTR
+    * LPWSTR
+
+## Unicodeとマルチバイト文字
+
+VC++等では、
+
+* ユニコード文字列を処理する文字をワイド文字と呼び、wchar_t型で表す
+* ユニコード以前のShift_JISやascii文字をマルチバイト文字と呼び、char型で表す
+
+
+
+## TCHAR型
+
+TCHAR、LPCTSTRやLPTSTRなどのTCHAR系列の型は、ソースコードをユニコードと非ユニコード(=マルチバイト)のどちらにも対応できるようにするための型。
+
+```cpp
+#ifdef UNICODE
+	typedef WCHAR    TCHAR;
+#else // MBCS(Multi-Bytes CharSet)
+	typedef char     TCHAR;
+#endif
+```
+
+となっていてコンパイル時に「UNICODE」が定義されているとTCHARはWCHAR、定義されていないとTCHARはchar型として定義される。
+
+|型名|MBCSでの実際の型|UNICODE定義時の実際の型|
+|---|---|---|
+|TCHAR|char|WCHAR(wchar_t)|
+|LPCTSTR|const char*|const WCHAR*|
+|LPTSTR|char*|WCHAR*|
+
+```cpp
+// 以下は同じ文
+const char* str = "日本語";
+LPCSTR str = "日本語";
+```
+
+```cpp
+// 以下は同じ文
+const wchar_t* wstr  = L"ワイド文字";
+LPCTSTR wstr = L"ワイド文字";
+```
+
+参考: https://www.usefullcode.net/2006/11/tcharlpctstrlptstr.html
+
+## その他補足
+
+### ATL(Active Template Library)
+
+コンポーネントオブジェクトモデル (COM) オブジェクトのプログラミングを簡素化する、テンプレートベースの C++ クラスのセット。  
+(COMは、Windowsでのソフトウェアコンポーネントの作成および使用を目的としたバイナリ仕様)
