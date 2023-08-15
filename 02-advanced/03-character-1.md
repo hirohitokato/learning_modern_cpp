@@ -65,6 +65,8 @@ MSVCの場合、UTF-8で保存する際にBOMをつければ認識してくれ�
 VC++等では、
 
 * ユニコード文字列を処理する文字をワイド文字と呼び、wchar_t型で表す
+    * MSVCではwchar_tのサイズは2、UTF-16で格納
+    * macOS, linuxではwchar_tのサイズは4、UTF-32で格納
 * ユニコード以前のShift_JISやascii文字をマルチバイト文字と呼び、char型で表す
 
 
