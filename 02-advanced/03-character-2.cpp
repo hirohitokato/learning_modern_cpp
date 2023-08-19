@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <cstdio>
+#include <fstream>
 
 int main()
 {
@@ -7,6 +9,7 @@ int main()
     std::cout << a << "/" << a.length() << std::endl;
 
     std::u8string u8str = u8"abcdあいうえお";
+    // std::basic_ofstream<char8_t> out(stdout);
     // std::cout << u8str << "/" << std::endl;
 
     std::wstring wa = L"abcdあいうえお";
@@ -18,6 +21,7 @@ int main()
     {
         std::string s = "い"; // SJIS(82 A0), UTF8(E3 81 82)
         std::wstring ws = L"あいうえお";
+        std::wcout << ws << std::endl;
         std::byte buff[2] = {};
         std::memcpy(buff, s.data(), 1);
         printf("%02x\n", std::to_integer<int>(buff[0]));
