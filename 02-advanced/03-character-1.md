@@ -1,14 +1,16 @@
 # 文字コード
 
-## 1. C++の文字列型と文字コード
+## 1. C++の文字列型と文字型と文字コード
 
-|型|説明|文字コード(符号化方式)|
+|文字列型|使用する文字型と説明|文字コード(符号化方式)|
 |---|---|---|
 |std::string|char型の文字列|規定なし|
-|std::u8string|char8_t型の文字列|UTF-8|
+|std::u8string|char8_t型の文字列(*)|UTF-8|
 |std::u16string|char16_t型の文字列|UTF-16|
 |std::u32string|char32_t型の文字列|UTF-32|
 |std::wstring|wchar_t型の文字列|規定なし
+
+*: C++17まではchar型
 
 ## 文字集合と符号化方式
 
@@ -70,7 +72,6 @@ VC++等では、
     * MSVCではwchar_tのサイズは2、UTF-16で格納
     * macOS, linuxではwchar_tのサイズは4、UTF-32で格納
 * ユニコード以前のShift_JISやascii文字をマルチバイト文字と呼び、char型で表す
-
 
 
 ## TCHAR型(MSVCのみ)
