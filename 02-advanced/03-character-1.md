@@ -2,31 +2,33 @@
 
 ## 1. C++の文字列型と文字型と文字コード
 
-|文字列型|使用する文字型と説明|文字コード(符号化方式)|
-|---|---|---|
-|std::string|char型の文字列|規定なし|
-|std::u8string|char8_t型の文字列(*)|UTF-8|
-|std::u16string|char16_t型の文字列|UTF-16|
-|std::u32string|char32_t型の文字列|UTF-32|
-|std::wstring|wchar_t型の文字列|規定なし
+|文字列型|使用する文字型と説明|文字コード<br>(符号化方式)|標準出力|
+|---|---|---|---|
+|std::string|char型の文字列|規定なし|std::cout|
+|std::u8string|char8_t型の文字列(*)|UTF-8|-|
+|std::u16string|char16_t型の文字列|UTF-16|-|
+|std::u32string|char32_t型の文字列|UTF-32|-|
+|std::wstring|wchar_t型の文字列|規定なし|std::wcout|
 
 *: C++17まではchar型
 
-## 文字集合と符号化方式
+## 2. 文字集合と符号化方式
 
-### 文字集合(Character Set)
+### 2.1. 文字集合(Character Set)
 
 各文字にユニークな番号を振ったもの。Unicodeの文字集合の符号空間は0～10FFFF16で111万4,112の符号位置を持つ。
 
 * 代表例: ASCII, JIS, Unicode
 
-### 符号化方式(エンコーディング/Encoding)
+### 2.2. 符号化方式(エンコーディング/Encoding)
 
 文字集合を実際のバイト列/データに変換する方式。古い環境との互換性やデータサイズを考慮しつつ決められる。
 
 * 代表例: ShiftJIS, UTF-8, UTF-16
 
-## ソースファイルからはじまるエンコーディング指定
+## 3. エンコーディングを取り巻く環境
+
+### 3.1. ソースファイルのエンコーディング
 
 VC++2023のcl.exeはソースファイルがSJISで書かれている・SJISのエンコーディング環境で実行することを想定したコンパイル処理が行われる。
 
@@ -49,6 +51,16 @@ MSVC(cl.exe)やGCC,Clangにはソース文字セット(入力)と実行文字セ
 * `gcc -finput-charset=utf-8 -fexec-charset=cp932 sample.cpp`
 
 MSVCの場合、UTF-8で保存する際にファイルにBOMをつければ認識してくれる・・・が、BOMをつけるのはあまり好きではない(個人の意見です)。
+
+### 3.2. 出力ストリーム
+
+出力ストリーム(標準出力やファイルストリームなど)でstd::coutとstd::wcoutを混在させると、あとから呼んだ方は出力されなくなる。
+
+`byte-oriented`モードと`wide-oriented`モードのどちらかのモードを持ち、最初に呼んだ方で固定されるため。  
+以下のどちらも後者が表示されない。
+
+1. std::cout/printf()を呼んだあとにstd::wcout/wprintf()を呼ぶ
+2. std::wcout/wprintf()を呼んだあとにstd::cout/printf()を呼ぶ
 
 
 * ファイル
