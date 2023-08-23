@@ -27,7 +27,7 @@ Windowsでいう「コードページ」はエンコーディングのこと（�
 * 文字集合
 * 符号化方式
 
-のどちらの意味で使われることもあるので、文字を扱うときには注意。
+のどちらの意味で使われることもあるので、自分が話すときにはどちらの意味で使っているかを意識すること。
 
 ## 1. C++で登場する文字列型とエンコーディング
 
@@ -117,13 +117,13 @@ TCHARは他にもいくつかバリエーションがある。中身はC++標準
 |LPTSTR|char*|WCHAR*|
 
 ```cpp
-// 以下は同じ文
+// 以下はマルチバイト文字のときに同じ文
 const char* str = "日本語";
 LPCSTR str = "日本語";
 ```
 
 ```cpp
-// 以下は同じ文
+// 以下はユニコード文字のときに同じ文
 const wchar_t* wstr  = L"ワイド文字列";
 LPCTSTR wstr = L"ワイド文字列";
 ```
@@ -139,9 +139,9 @@ Windowsでは`_T("～")`という文字列リテラルを表すためのマク�
 const auto* tstr  = _T("ワイド文字列かユニコード文字列");
 // 以下は同じ文
 #ifdef _UNICODE
-    const wchar_t** tstr  = L"ワイド文字列かユニコード文字列";
+    const wchar_t* tstr  = L"ワイド文字列かユニコード文字列";
 #else // MBCS(Multi-Bytes CharSet)
-    const char_t** tstr  = "ワイド文字列かユニコード文字列";
+    const char_t* tstr  = "ワイド文字列かユニコード文字列";
 #endif
 ```
 
@@ -153,11 +153,11 @@ WindowsのATL(Active Template Library)なるライブラリは、独自の文字
 
 これは文字の管理にchar型とwchar_t型のどちらを使っているか意識しなくても済むよう設計された型。
 
-CStringはUNICODEマクロが有効なときにCStringの実体はCStringWとなり、無効なときにはCStringAが実体で使われる。
+CStringは_UNICODEマクロが有効なときにCStringの実体はCStringWとなり、無効なときにはCStringAが実体で使われる。
 
 ```cpp
 // 正確ではない、概念説明のためのコード
-#ifdef UNICODE
+#ifdef _UNICODE
 	typedef CString    CStringW;
 #else // MBCS(Multi-Bytes CharSet)
 	typedef CString    CStringA;
