@@ -1,30 +1,55 @@
 #include <iostream>
+#include <iomanip>
 #include <string>
-#include <cstdio>
 #include <fstream>
+#include <cstddef>
+using namespace std::literals::string_literals;
+
+template <class String>
+void dump(std::string name, String s, int len)
+{
+    std::cout << name;
+    std::cout << "\t:";
+
+    std::byte *buff = (std::byte *)std::calloc(len, sizeof(std::byte));
+    std::memcpy(buff, s.data(), len);
+    for (int i = 0; i < len; i++)
+    {
+        std::cout << " " << std::setfill('0') << std::setw(2) << std::hex << std::to_integer<int>(buff[i]);
+    }
+    std::cout << std::endl;
+    std::free(buff);
+}
 
 int main()
 {
-    std::string a = "abcdã‚ã„ã†ãˆãŠ";
-    std::cout << a << "/" << a.length() << std::endl;
+    // ƒ\[ƒXƒtƒ@ƒCƒ‹‚â/execution-charset‚ÅŽw’è‚µ‚½ƒGƒ“ƒR[ƒfƒBƒ“ƒO
+    std::string s = "abcd‚ ‚¢‚¤‚¦‚¨";
+    std::cout << "std::string     : size=" << s.size() << std::endl; // SJIS‚¾‚Æ14(4+(2*5)),utf-8‚¾‚Æ19(4+(3*5))
+    dump("std::string"s, s, 16);
+    std::cout << std::endl;
 
-    std::u8string u8str = u8"abcdã‚ã„ã†ãˆãŠ";
-    // std::basic_ofstream<char8_t> out(stdout);
-    // std::cout << u8str << "/" << std::endl;
+    // Windows‚¾‚ÆUTF-16
+    std::wstring wa = L"abcd‚ ‚¢‚¤‚¦‚¨";
+    std::cout << "std::wstring    : size=" << wa.size() << std::endl; // 9(•¶Žš”)
+    dump("std::wstring"s, wa, 16);
+    std::cout << std::endl;
 
-    std::wstring wa = L"abcdã‚ã„ã†ãˆãŠ";
-    // std::wcout << wa << "/" << wa.length() << std::endl;
+    // UTF-8
+    std::u8string u8s = u8"abcd‚ ‚¢‚¤‚¦‚¨";
+    std::cout << "std::u8string   : size=" << u8s.size() << std::endl; // 13(4+9?)
+    dump("std::u8string"s, u8s, 16);
+    std::cout << std::endl;
 
-    std::u16string u16str = u"abcdã‚ã„ã†ãˆãŠ";
+    // UTF-16
+    std::u16string u16s = u"abcd‚ ‚¢‚¤‚¦‚¨";
+    std::cout << "std::u16string  : size=" << u16s.size() << std::endl; // 9(•¶Žš”)
+    dump("std::u16string"s, u16s, 16);
+    std::cout << std::endl;
 
-    // CP932(SJIS)
-    {
-        std::string s = "ã„"; // SJIS(82 A0), UTF8(E3 81 82)
-        std::wstring ws = L"ã‚ã„ã†ãˆãŠ";
-        std::wcout << ws << std::endl;
-        std::byte buff[2] = {};
-        std::memcpy(buff, s.data(), 1);
-        printf("%02x\n", std::to_integer<int>(buff[0]));
-        std::cout << std::to_integer<int>(buff[0]) << std::endl;
-    }
+    // UTF-32
+    std::u32string u32s = U"abcd‚ ‚¢‚¤‚¦‚¨";
+    std::cout << "std::u32string  : size=" << u32s.size() << std::endl; // 9(•¶Žš”)
+    dump("std::u32string"s, u32s, 16);
+    std::cout << std::endl;
 }
