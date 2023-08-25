@@ -23,3 +23,4 @@ C++17以降のプログラミング環境にふさわしい知識・技術をま
 1. 2023/7/28 02-advanced/01-threads-3.md&cpp
 1. 2023/8/9 02-advanced/02-async.cpp
 1. 2023/8/23 02-advanced/03-character-1.md
+1. 2023/8/25 02-advanced/03-character-1.md,  02-advanced/03-character-2.cpp

@@ -23,33 +23,33 @@ void dump(std::string name, String s, int len)
 
 int main()
 {
-    // ƒ\[ƒXƒtƒ@ƒCƒ‹‚â/execution-charset‚Åw’è‚µ‚½ƒGƒ“ƒR[ƒfƒBƒ“ƒO
-    std::string s = "abcd‚ ‚¢‚¤‚¦‚¨";
-    std::cout << "std::string     : size=" << s.size() << std::endl; // SJIS‚¾‚Æ14(4+(2*5)),utf-8‚¾‚Æ19(4+(3*5))
+    // ã‚½ãƒ¼ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«ã‚„/execution-charsetã§æŒ‡å®šã—ãŸã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°
+    std::string s = "abcdã‚ã„ã†ãˆãŠ";
+    std::cout << "std::string     : size=" << s.size() << std::endl; // SJISã ã¨14(4+(2*5)),utf-8ã ã¨19(4+(3*5))
     dump("std::string"s, s, 16);
     std::cout << std::endl;
 
-    // Windows‚¾‚ÆUTF-16
-    std::wstring wa = L"abcd‚ ‚¢‚¤‚¦‚¨";
-    std::cout << "std::wstring    : size=" << wa.size() << std::endl; // 9(•¶š”)
+    // Windowsã ã¨UTF-16
+    std::wstring wa = L"abcdã‚ã„ã†ãˆãŠ";
+    std::cout << "std::wstring    : size=" << wa.size() << std::endl; // 9(æ–‡å­—æ•°)
     dump("std::wstring"s, wa, 16);
     std::cout << std::endl;
 
     // UTF-8
-    std::u8string u8s = u8"abcd‚ ‚¢‚¤‚¦‚¨";
+    std::u8string u8s = u8"abcdã‚ã„ã†ãˆãŠ";
     std::cout << "std::u8string   : size=" << u8s.size() << std::endl; // 13(4+9?)
     dump("std::u8string"s, u8s, 16);
     std::cout << std::endl;
 
     // UTF-16
-    std::u16string u16s = u"abcd‚ ‚¢‚¤‚¦‚¨";
-    std::cout << "std::u16string  : size=" << u16s.size() << std::endl; // 9(•¶š”)
+    std::u16string u16s = u"abcdã‚ã„ã†ãˆãŠ";
+    std::cout << "std::u16string  : size=" << u16s.size() << std::endl; // 9(æ–‡å­—æ•°)
     dump("std::u16string"s, u16s, 16);
     std::cout << std::endl;
 
     // UTF-32
-    std::u32string u32s = U"abcd‚ ‚¢‚¤‚¦‚¨";
-    std::cout << "std::u32string  : size=" << u32s.size() << std::endl; // 9(•¶š”)
+    std::u32string u32s = U"abcdã‚ã„ã†ãˆãŠ";
+    std::cout << "std::u32string  : size=" << u32s.size() << std::endl; // 9(æ–‡å­—æ•°)
     dump("std::u32string"s, u32s, 16);
     std::cout << std::endl;
 }
