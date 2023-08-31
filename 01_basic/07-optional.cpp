@@ -4,6 +4,11 @@
 
 // a/bで除算をした結果を返す関数。
 // bがゼロの場合、無効値が返る
+
+/// @brief 
+/// @param a 
+/// @param b 
+/// @return 
 std::optional<int> safe_divide(int a, int b)
 {
     if (b == 0)
@@ -12,6 +17,9 @@ std::optional<int> safe_divide(int a, int b)
     return a / b;
 }
 
+/// @brief std::optionalクラスを使うと値が無効かどうかチェックする記述を簡潔に書ける。
+///  記述量が減ってシンプルな表記にできることがメリット。またエラーであることを明示的に
+///  示す値を利用出来るので、不具合も減るはず
 int main()
 {
     {
