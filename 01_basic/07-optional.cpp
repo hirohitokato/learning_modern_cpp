@@ -2,13 +2,10 @@
 #include <iostream>
 #include <optional>
 
-// a/bで除算をした結果を返す関数。
-// bがゼロの場合、無効値が返る
-
-/// @brief 
-/// @param a 
-/// @param b 
-/// @return 
+/// @brief a/bで除算をした結果を返す関数。
+/// @param a 割られる数
+/// @param b 割る数
+/// @return a/bの値。bがゼロの場合、無効値が返る
 std::optional<int> safe_divide(int a, int b)
 {
     if (b == 0)
@@ -23,11 +20,11 @@ std::optional<int> safe_divide(int a, int b)
 int main()
 {
     {
-        std::optional<int> result = safe_divide(9, 3);
+        std::optional<int> result = safe_divide(9, 3); // 3
         if (result) // 無効値が入っていないか検査。値が入っている場合はtrueを返す
         {
-            int x = result.value();
-            std::cout << "result of 9/3 : " << x << std::endl;
+            int x = result.value();                            // ここで値を取り出す
+            std::cout << "result of 9/3 : " << x << std::endl; // 3
         }
     }
 
@@ -47,8 +44,7 @@ int main()
         // ↑は↓の文と同じ意味
         // int result_ = result.has_value() ? result.value() : static_cast<int>(std::forward<int>(-1));
 
-
-        std::cout << "dividing result : " << result << std::endl; // dividing result : -1
+        std::cout << "dividing result : " << result_ << std::endl; // dividing result : -1
     }
 
     return 0;
