@@ -24,4 +24,5 @@ C++17以降のプログラミング環境にふさわしい知識・技術をま
 1. 2023/8/9 02-advanced/02-async.cpp
 1. 2023/8/23 02-advanced/03-character-1.md
 1. 2023/8/25 02-advanced/03-character-1.md, 02-advanced/03-character-2.cpp
-1. 2023/9/01 01_basic/07-optional.cpp, 05-tips/06-using_enum.cpp
+1. 2023/9/1 01_basic/07-optional.cpp, 05-tips/06-using_enum.cpp
+1. 2023/9/6 01_basic/06-uniform_init.cpp
