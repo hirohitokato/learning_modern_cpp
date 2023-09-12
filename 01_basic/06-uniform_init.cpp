@@ -117,6 +117,11 @@ int main()
     {
         // 一様初期化を使わないほうが良いケース
         // @see https://qiita.com/h2suzuki/items/d033679afde821d04af8#3-使わない方が無難なケース
+
+        // 1. 要素が１個のコンストラクタ
+        std::vector<int> v(10);         // サイズ10の int のベクタ、全要素 0
+        std::vector<int> w{10};         // サイズ1の int のベクタ、最初の要素 10
+        std::vector<std::string> s{10}; // サイズ10の string のベクタ、全要素は空（コンパイルエラーにしてくれない）
     }
 
     return 0;
