@@ -37,7 +37,7 @@ int main()
         A a1 = 1;       // A(int x)が呼ばれる
         A a2 = "Hello"; // A(const char *s, int x = 0)が呼ばれる
 
-        // ちなみにこれらはOK
+        // ちなみにこれらは明示的なのでOK
         A a3;                     // A()
         A a4 = A(1);              // A(int x)
         A a5(1);                  // A(int x)
@@ -61,7 +61,7 @@ int main()
         A2 a7 = (A2)1;               // A(int x)。明示的型変換になる
         A2 a8 = static_cast<A2>(1);  // A(int x)
         A2 a9 = (A2) "Hello";        // A(const char*,int)
-        A2 a10 = (A2){"Hello", 193}; // A(const char*,int)
+        A2 a10 = (A2){"Hello", 193}; // A(const char*,int) ←MSVCだとコンパイルエラー(ClangはOK)
     }
     {
         B b1 = {0,0}; // OK。これを良しとするかどうかはAPI提供者次第
@@ -73,8 +73,10 @@ int main()
     }
 }
 
-// Google Style Guideによると
-// * 暗黙的型変換を新たに定義してはいけません。 型変換演算子や、1つの引数をとるコンストラクタにおいてはexplicitキーワードを使用してください。
+// [Google Style Guide](https://ttsuki.github.io/styleguide/cppguide.ja.html#Implicit_Conversions)
+// にかかれている内容を整理すると、
+// * 暗黙的型変換を新たに定義してはダメ。引数を１つとるコンストラクタにおいてはexplicitキーワードを使用すること
+//   * (型変換演算子もそうだが、今回は省略)
 // * ただし以下のケースはexplicitはなくても良い
-//   * また、1つのstd::initializer_list型の引数をとるコンストラクタについも、
+//   * std::initializer_list型の引数を１つとるコンストラクタで、
 //     コピーによる初期化(例: MyType m = {1, 2};)をサポートするためにはexplicitを省略する。
