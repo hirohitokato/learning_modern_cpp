@@ -40,10 +40,10 @@ int main()
         // ちなみにこれらは明示的なのでOK
         A a3;                     // A()
         A a4 = A(1);              // A(int x)
-        A a5(1);                  // A(int x)
+        A a5{1};                  // A(int x)
         A a6 = A("Venditti");     // A(const char*,int)
         A *p = new A(1);          // A(int x)
-        A a7 = (A)1;              // A(int x)
+        A a7 = (A)1;              // A(int x)。明示的型変換になる
         A a8 = static_cast<A>(1); // A(int x)
     }
     {
@@ -64,12 +64,14 @@ int main()
         A2 a10 = (A2){"Hello", 193}; // A(const char*,int) ←MSVCだとコンパイルエラー(ClangはOK)
     }
     {
-        B b1 = {0,0}; // OK。これを良しとするかどうかはAPI提供者次第
-        FuncB({1,2}); // OK。わかりにくいけれど
+        B b1 = {0, 0}; // OK。これを良しとするかどうかはAPI提供者次第
+        FuncB({1, 2}); // OK。わかりにくいけれど
     }
     {
         // B2 b1 = {0, 0}; // NG。コンパイルエラー
         // FuncB2({0, 0}); // NG。コンパイルエラー
+        B2 b1{0, 0};      // OK
+        FuncB2(B2(0, 0)); // OK
     }
 }
 
