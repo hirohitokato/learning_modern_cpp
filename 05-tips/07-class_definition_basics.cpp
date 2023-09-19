@@ -27,7 +27,7 @@ namespace some_namespace
         // デフォルトコンストラクタ
         BaseClass() {}
 
-        // 引数付のコンストラクタ
+        // 引数付のコンストラクタ。１引数の場合は`explicit`をつけること
         explicit BaseClass(const std::string &value)
             : privateMember_(value) {}
 
