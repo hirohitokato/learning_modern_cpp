@@ -42,10 +42,10 @@ namespace some_namespace
         BaseClass &operator=(const BaseClass &from);
         // BaseClass &operator=(const BaseClass &from) = delete;
 
-        // ムーブコンストラクタ。必要に応じて宣言
+        // ムーブコンストラクタ。必要に応じて宣言。不要ならばdeleteを書く
         BaseClass(BaseClass &&rhs) noexcept = delete;
 
-        // ムーブ代入演算子。必要に応じて宣言
+        // ムーブ代入演算子。必要に応じて宣言。不要ならばdeleteを書く
         BaseClass &operator=(BaseClass &&rhs) noexcept = delete;
 
         // デストラクタ
@@ -60,18 +60,17 @@ namespace some_namespace
         // ※constを付ける場合はスレッドセーフになるように設計すること
         virtual std::string toString() const;
 
-        //------------------------------------------
-        // クラス定数
-        //------------------------------------------
-        static constexpr uint32_t const CONST_INTEGER = 0;
-        static constexpr char *const CONST_STRING = (char *const)"compile-time constants";
-
     private:
         // privateメンバー関数
         std::string privateMember_;
+    };
 
-        // const関数をスレッドセーフにするためのMutexオブジェクトを使う場合は
-        // const関数内で変更できるようにMutexオブジェクトに「mutable」を指定する
-        // mutable std::mutex mutexToString_;
+    class SubClass: public BaseClass
+    {
+    public:
+        SubClass(/* args */);
+        virtual ~SubClass(); // さらに継承される可能性がある場合はvirtualをつける
+
+        // 親クラスでdeleteしたものはサブクラスでもdeleteされる
     };
 }
