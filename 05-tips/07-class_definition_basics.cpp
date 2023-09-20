@@ -37,20 +37,23 @@ namespace some_namespace
             : privateMember_(from.privateMember_) {}
         // BaseClass(const BaseClass &from) = delete;
 
+        // デストラクタ
+        // ※基底クラスは必ずvirtualを付けること!!【必須】
+        // 注:デストラクタにvirtualをつけた場合は、ムーブ系のメソッドは自動生成されなくなる
+        virtual ~BaseClass() {}
+
         // コピー代入演算子のオーバーロード
         // ※代入させたくない場合は`= delete`を記述
         BaseClass &operator=(const BaseClass &from);
         // BaseClass &operator=(const BaseClass &from) = delete;
 
         // ムーブコンストラクタ。必要に応じて宣言。不要ならばdeleteを書く
+        // 書かないと必要なときに自動生成されるが、このコードのようにデストラクタが付いている場合は自動生成されない
         BaseClass(BaseClass &&rhs) noexcept = delete;
 
         // ムーブ代入演算子。必要に応じて宣言。不要ならばdeleteを書く
+        // 書かないと必要なときに自動生成されるが、このコードのようにデストラクタが付いている場合は自動生成されない
         BaseClass &operator=(BaseClass &&rhs) noexcept = delete;
-
-        // デストラクタ
-        // ※基底クラスは必ずvirtualを付けること!!【必須】
-        virtual ~BaseClass() {}
 
         // パブリックなメンバー関数。
         // ※例外を出力しない場合は`noexcept`を書く(パフォーマンスに影響)
