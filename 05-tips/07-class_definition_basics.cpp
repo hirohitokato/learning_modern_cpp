@@ -1,46 +1,45 @@
 /// クラス定義のテンプレート
+#include <iostream>
+#include <string>
+#include <mutex>
 
 /*
  * @see: https://qiita.com/qiita_kuru/items/95989a26f76678b7c3f1
- * C++11～でクラスを定義する場合の必要最低限のテンプレートが記載。
- * クラスを定義する際のファイル構成、ファイルの書き方、クラス定義の方法など。
+ * C++11～でクラスを定義する場合の必要最低限のテンプレートが記載されている。
+ * クラスを定義する際のファイル構成、ファイルの書き方、クラス定義の方法など参考になる。
  */
 
-//////////////////////////////////////
-// ヘッダファイル
-//////////////////////////////////////
-// 1.ヘッダファイルのインクルード
-#include <iostream>
-#include <mutex>
-
-// 2.マクロ定義はここに記述
-
-// 3.名前空間の定義はここに記述し、全体を包んでおく
+// 2.名前空間の定義はここに記述し、全体を包んでおく
 // ※名前空間に包んだ場合は、実装ファイル側も同様にnamespaceを記述すること
 namespace some_namespace
 {
     // 必要に応じて多重に包む
-    //    namespace project {
+    //    namespace project { ... *
     class BaseClass
     {
     public:
-        // デフォルトコンストラクタ
+        // デフォルトコンストラクタ。他のコンストラクタを書いた場合は暗黙で作られない。
         BaseClass() {}
 
         // 引数付のコンストラクタ。１引数の場合は`explicit`をつけること
         explicit BaseClass(const std::string &value)
+            : privateMember_(value)
+        {
+        }
+
+        BaseClass(const std::string &value, int arg)
             : privateMember_(value) {}
+
+        // デストラクタ
+        // ※基底クラスは必ずvirtualを付けること!!【必須】
+        // 注:デストラクタにvirtualをつけた場合は、ムーブ系のメソッドは自動生成されなくなる
+        virtual ~BaseClass() {}
 
         // コピーコンストラクタ
         // ※コピーさせたくない場合は`= delete`を記述
         BaseClass(const BaseClass &from)
             : privateMember_(from.privateMember_) {}
         // BaseClass(const BaseClass &from) = delete;
-
-        // デストラクタ
-        // ※基底クラスは必ずvirtualを付けること!!【必須】
-        // 注:デストラクタにvirtualをつけた場合は、ムーブ系のメソッドは自動生成されなくなる
-        virtual ~BaseClass() {}
 
         // コピー代入演算子のオーバーロード
         // ※代入させたくない場合は`= delete`を記述
@@ -59,8 +58,8 @@ namespace some_namespace
         // ※例外を出力しない場合は`noexcept`を書く(パフォーマンスに影響)
         int publicMethod(const std::string &input, std::string &output) noexcept;
 
-        // 継承してもらうことを狙ったメソッドにはvirtualキーワードを付けて
-        // 仮想関数にしておく。（付けないと常に親クラスのメソッドが呼ばれてしまう）
+        // 継承してもらうことを狙ったメソッドにはvirtualキーワードを付けて仮想関数にしておく。
+        // （付けないと常に親クラスのメソッドが呼ばれてしまう）
         // （親クラスでのインスタンス化を禁止したい場合は virtual ～() = 0;と純粋仮想関数にしておく)
         virtual void overridableMethod(int arg1, const std::string &str) {}
 
@@ -69,7 +68,7 @@ namespace some_namespace
         virtual std::string toString() const;
 
     private:
-        // privateメンバー関数
+        // privateフィールド
         std::string privateMember_;
     };
 
@@ -89,5 +88,6 @@ namespace some_namespace
     // これ以上継承させたくないときは`final`を付ける
     class SubClass2 final : public BaseClass
     {
-    }
+        ~SubClass2(); // virtual不要(継承できないので)
+    };
 }
