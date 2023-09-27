@@ -1,4 +1,4 @@
-// 仮想関数をオーバーライドするときは`override`を付ける癖を持とう
+// 仮想関数をオーバーライドするときは`override`を付ける癖を持とう(C++11～)
 #include <iostream>
 #include <memory>
 
@@ -16,7 +16,7 @@ namespace Bad
     class Derived : public Base
     {
     public:
-        virtual void f() const
+        virtual void f() const // 実は別の関数に...
         {
             std::cout << "Derived class\n";
         }
@@ -52,7 +52,7 @@ int main()
         obj.f(); // → Derived class (overridden)
 
         std::unique_ptr<Base> ptr = std::make_unique<Good::Derived>();
-        // Base *ptr = new Bad::Derived(); でもOK
+        // Base *ptr = new Good::Derived(); でもOK
         ptr->f(); // → Derived class (overridden) (yay!)
     }
 
