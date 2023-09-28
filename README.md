@@ -30,4 +30,4 @@ C++17以降のプログラミング環境にふさわしい知識・技術をま
 1. 2023/09/20 05-tips/07-class_definition_basics.cpp
 1. 2023/09/22 05-tips/07-class_definition_basics.cpp
 1. 2023/09/27 05-tips/08-use_override_keyword.cpp
-
+1. 2023/09/29 Summary
